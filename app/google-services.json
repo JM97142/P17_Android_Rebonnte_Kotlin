@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "753484460169",
+    "project_id": "p17-gestionstockmedicame-def67",
+    "storage_bucket": "p17-gestionstockmedicame-def67.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753484460169:android:fcd64ebda8543aaef89658",
+        "android_client_info": {
+          "package_name": "com.openclassrooms.rebonnte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfXGwkRxc8XLTnrezR8y2FzRqkS9ZCdLk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
