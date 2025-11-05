@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-
-
 class MedicineRepository(private val firestore: FirebaseFirestore) {
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
@@ -20,7 +18,7 @@ class MedicineRepository(private val firestore: FirebaseFirestore) {
         loadMedicines()
     }
 
-    private fun loadMedicines() {
+    fun loadMedicines() {
         listenerRegistration?.remove()
         println("Attaching new medicine snapshot listener")
         listenerRegistration = firestore.collection(MEDICINES_COLLECTION)
