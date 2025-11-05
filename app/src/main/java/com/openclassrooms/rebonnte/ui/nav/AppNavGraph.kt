@@ -9,11 +9,15 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
 import com.openclassrooms.rebonnte.ui.login.EmailScreen
 import com.openclassrooms.rebonnte.ui.login.LogInScreen
 import com.openclassrooms.rebonnte.ui.login.RecoveryScreen
+import com.openclassrooms.rebonnte.ui.medicine.MedicineDetailScreen
+import com.openclassrooms.rebonnte.ui.medicine.MedicineScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.signin.SignInScreen
 import com.openclassrooms.rebonnte.ui.signin.SignInViewModel
@@ -70,8 +74,8 @@ fun NavGraphBuilder.appNavigation(
 
     composable("email_sign_in") {
         EmailScreen(
-            onLogInClick = { navController.navigate("log_in") },
-            onSignUpClick = { navController.navigate("sign_up") },
+            onLogInClick = { navController.navigate("login") },
+            onSignUpClick = { navController.navigate("signup") },
             navController = navController
         )
     }
@@ -82,24 +86,38 @@ fun NavGraphBuilder.appNavigation(
 
     composable("medicine") {
         val medicineViewModel: MedicineViewModel = koinViewModel()
+        MedicineScreen(navController, medicineViewModel)
     }
 
-    composable("sign_up") {
+    composable("signup") {
         SignUpScreen(
             onLoginSuccess = {
                 navController.navigate("aisle") {
-                    popUpTo("sign_up") { inclusive = true }
+                    popUpTo("signup") { inclusive = true }
                 }
             },
             navController = navController
         )
     }
 
-    composable("log_in") {
+    composable("login") {
         LogInScreen(navController = navController)
     }
 
     composable("password_recovery") {
         RecoveryScreen(navController = navController)
+    }
+
+    composable(
+        "medicine_detail/{medicineName}",
+        arguments = listOf(navArgument("medicineName") { type = NavType.StringType })
+    ) { backStackEntry ->
+        val medicineName = backStackEntry.arguments?.getString("medicineName") ?: "Unknown"
+        val medicineViewModel: MedicineViewModel = koinViewModel()
+        MedicineDetailScreen(
+            name = medicineName,
+            viewModel = medicineViewModel,
+            onBack = { navController.popBackStack() }
+        )
     }
 }

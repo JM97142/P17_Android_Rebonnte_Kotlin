@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.savedstate.android)
     implementation(libs.ui.test.junit4.android)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.work.runtime.ktx)
     ksp(libs.hilt.compiler)
     // Compose
     implementation(libs.androidx.core.ktx)
