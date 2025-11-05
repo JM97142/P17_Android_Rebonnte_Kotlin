@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.material.icons.extended)
     implementation(libs.material)
+    implementation(libs.androidx.material)
     implementation(libs.compose.material3)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
