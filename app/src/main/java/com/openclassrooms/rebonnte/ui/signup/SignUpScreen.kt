@@ -35,7 +35,7 @@ fun SignUpScreen(
     val name = rememberSaveable { mutableStateOf("") }
     val lastname = rememberSaveable { mutableStateOf("") }
     val emailError = rememberSaveable { mutableStateOf<String?>(null) }
-    val currentStep = rememberSaveable { mutableStateOf(1) }
+    val currentStep = rememberSaveable { mutableIntStateOf(1) }
     val password = rememberSaveable { mutableStateOf("") }
     val passwordError = rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -112,7 +112,11 @@ fun SignUpTopBar(currentStep: MutableState<Int>, navController: NavController) {
 
 @Composable
 fun DisplayAppIcon() {
-    Text(text = stringResource(id = R.string.app_name), color = Color.Black, fontSize = 20.sp)
+    Text(
+        text = stringResource(id = R.string.app_name),
+        color = Color.Black,
+        fontSize = 20.sp
+    )
 }
 
 fun handleEmailValidation(

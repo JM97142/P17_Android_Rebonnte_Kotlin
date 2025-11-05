@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.update
 
 
 class SignInViewModel(
-    googleAuthUiClient: GoogleAuthClient,
+    googleAuthClient: GoogleAuthClient,
     emailAuthClient: EmailAuthClient
 ) : ViewModel() {
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
 
     init {
-        val signedInUser = googleAuthUiClient.getSignedInUser() ?: emailAuthClient.getSignedInUser()
+        val signedInUser = googleAuthClient.getSignedInUser() ?: emailAuthClient.getSignedInUser()
         if (signedInUser != null) {
             _state.update { it.copy(userData = signedInUser, isSignInSuccessful = true) }
         }

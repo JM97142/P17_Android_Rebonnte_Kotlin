@@ -1,8 +1,10 @@
 package com.openclassrooms.rebonnte.models
 
-class History(
-    var medicineName: String,
-    var userId: String,
-    var date: String,
-    var details: String
-)
+data class History(
+    val medicineName: String = "",
+    val userId: String = "",
+    val date: String = "",
+    val details: String = ""
+) {
+    constructor() : this("", "", "", "")
+}
