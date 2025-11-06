@@ -81,7 +81,7 @@ fun LogInScreen(navController: NavController) {
 @Composable
 fun LoginTopAppBar(currentStep: MutableState<Int>, navController: NavController) {
     TopAppBar(
-        title = { Text(text = stringResource(id = R.string.sign_in), color = Color.White) },
+        title = { Text(text = stringResource(id = R.string.sign_in), color = Color.Black) },
         navigationIcon = {
             IconButton(
                 onClick = {
@@ -95,7 +95,7 @@ fun LoginTopAppBar(currentStep: MutableState<Int>, navController: NavController)
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.back),
-                    tint = Color.White
+                    tint = Color.Black
                 )
             }
         }
@@ -133,7 +133,6 @@ fun EmailStep(
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
         shape = RectangleShape,
     ) {
         Text("Next", color = Color.White)
@@ -179,7 +178,6 @@ fun PasswordStep(
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
         shape = RectangleShape,
     ) {
         Text(text = stringResource(id = R.string.sign_in), color = Color.Black)

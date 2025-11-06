@@ -179,7 +179,6 @@ fun SendResetEmailButton(
             .padding(16.dp, bottom = 16.dp)
             .width(200.dp)
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
         shape = RectangleShape
     ) {
         Text("Send Reset Email", color = Color.Black)

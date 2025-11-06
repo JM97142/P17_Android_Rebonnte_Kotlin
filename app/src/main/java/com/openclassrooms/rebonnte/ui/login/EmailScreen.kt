@@ -42,12 +42,12 @@ fun EmailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(id = R.string.sign_in_email), color = Color.White) },
+                title = { Text(text = stringResource(id = R.string.sign_in_email), color = Color.Black) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("sign_in") }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            tint = Color.White,
+                            tint = Color.Black,
                             contentDescription = stringResource(id = R.string.back)
                         )
                     }
@@ -71,7 +71,11 @@ fun EmailScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(id = R.string.app_name), color = Color.Black, fontSize = 20.sp)
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    color = Color.Black,
+                    fontSize = 20.sp
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -81,7 +85,6 @@ fun EmailScreen(
                         .padding(16.dp, bottom = 16.dp)
                         .width(300.dp)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     shape = RectangleShape,
                 ) {
                     Text(
@@ -99,7 +102,6 @@ fun EmailScreen(
                         .padding(16.dp, bottom = 16.dp)
                         .width(300.dp)
                         .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                     shape = RectangleShape,
                 ) {
                     Text(

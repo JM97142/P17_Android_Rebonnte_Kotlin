@@ -8,7 +8,7 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.Firebase
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
-import com.openclassrooms.rebonnte.R
+import com.openclassrooms.rebonnte.BuildConfig
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.CancellationException
 
@@ -58,8 +58,6 @@ class GoogleAuthClient(
         }
     }
 
-
-
     suspend fun signOut(){
         try {
             oneTapClient.signOut().await()
@@ -79,14 +77,13 @@ class GoogleAuthClient(
         )
     }
 
-
     private fun builSignInRequest(): BeginSignInRequest {
         return BeginSignInRequest.Builder()
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(context.getString(R.string.web_client_id))
+                    .setServerClientId(BuildConfig.WEB_CLIENT_ID)
                     .build()
             )
             .setAutoSelectEnabled(true)

@@ -88,7 +88,6 @@ fun EmailInput(
                 .padding(16.dp, bottom = 16.dp)
                 .width(150.dp)
                 .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
             shape = RectangleShape,
 
             ) {

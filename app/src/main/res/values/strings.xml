@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Rebonnte</string>
-    <string name="web_id">206778835221-1p6m5mqi5isg9epggo1h9551qjtk36rg.apps.googleusercontent.com</string>
     <string name="user_profile">User profile</string>
     <string name="event_list">Event list</string>
     <string name="notification_icon">Notification icon</string>

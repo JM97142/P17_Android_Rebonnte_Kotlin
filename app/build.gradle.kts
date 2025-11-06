@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.openclassrooms.rebonnte"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.openclassrooms.rebonnte"
@@ -22,6 +22,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField(
+            "String",
+            "WEB_CLIENT_ID",
+            "\"${project.findProperty("WEB_CLIENT_ID")}\""
+        )
     }
 
     buildTypes {
@@ -42,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"

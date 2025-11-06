@@ -18,7 +18,7 @@ firebaseMessagingKtx = "23.3.1"
 firebaseUiAuth = "8.0.1"
 firebaseUiFirestore = "8.0.1"
 hilt = "2.49"
-ksp = "1.9.23-1.0.20"
+ksp = "1.9.0-1.0.13"
 lifecycleRuntimeCompose = "2.7.0"
 lifecycleViewmodelSavedstateAndroid = "2.9.3"
 uiTestJunit4Android = "1.9.2"
@@ -36,7 +36,7 @@ kotlinxCoroutinesTest = "1.8.1"
 coreTesting = "2.1.0"
 coilCompose = "2.6.0"
 material = "1.11.0"
-workRuntimeKtx = "2.11.0"
+workRuntimeKtx = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

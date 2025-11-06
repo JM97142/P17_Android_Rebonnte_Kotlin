@@ -154,9 +154,8 @@ fun ErrorText(errorMessage: String?) {
     Text(
         text = errorMessage ?: "",
         color = Color.White,
-        style = MaterialTheme.typography.bodySmall,
-
-        )
+        style = MaterialTheme.typography.bodySmall
+    )
 }
 
 @Composable
@@ -181,7 +180,6 @@ fun LoginButton(
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
             .height(50.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
         shape = RectangleShape
     ) {
         Text(text = stringResource(id = R.string.save))

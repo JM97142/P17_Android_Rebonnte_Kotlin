@@ -12,7 +12,20 @@
           "package_name": "com.openclassrooms.rebonnte"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "753484460169-u1k86gjaackd6t9gi33h6cmug8aikneh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.openclassrooms.rebonnte",
+            "certificate_hash": "ad1868805cc37bdef6adf1593c09ee68bae54aa7"
+          }
+        },
+        {
+          "client_id": "753484460169-bv5u01o2s6tctaed6p8sg6vv1hqhq700.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDfXGwkRxc8XLTnrezR8y2FzRqkS9ZCdLk"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753484460169-bv5u01o2s6tctaed6p8sg6vv1hqhq700.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

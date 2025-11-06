@@ -91,7 +91,7 @@ fun SignUpTopBar(currentStep: MutableState<Int>, navController: NavController) {
         else -> R.string.sign_up
     }
     TopAppBar(
-        title = { Text(text = stringResource(id = title), color = Color.White) },
+        title = { Text(text = stringResource(id = title), color = Color.Black) },
         navigationIcon = {
             IconButton(onClick = {
                 if (currentStep.value > 1) {
@@ -103,7 +103,7 @@ fun SignUpTopBar(currentStep: MutableState<Int>, navController: NavController) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.back),
-                    tint = Color.White
+                    tint = Color.Black
                 )
             }
         }
