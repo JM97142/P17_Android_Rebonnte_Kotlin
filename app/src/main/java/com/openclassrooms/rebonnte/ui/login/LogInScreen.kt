@@ -22,6 +22,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.openclassrooms.rebonnte.R
+import com.openclassrooms.rebonnte.ui.login.composables.EmailStep
+import com.openclassrooms.rebonnte.ui.login.composables.LoginScreenLogo
+import com.openclassrooms.rebonnte.ui.login.composables.LoginTopAppBar
+import com.openclassrooms.rebonnte.ui.login.composables.PasswordStep
 
 @Composable
 fun LogInScreen(navController: NavController) {
@@ -74,119 +78,6 @@ fun LogInScreen(navController: NavController) {
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LoginTopAppBar(currentStep: MutableState<Int>, navController: NavController) {
-    TopAppBar(
-        title = { Text(text = stringResource(id = R.string.sign_in), color = Color.Black) },
-        navigationIcon = {
-            IconButton(
-                onClick = {
-                    if (currentStep.value > 1) {
-                        currentStep.value -= 1
-                    } else {
-                        navController.navigate("email_sign_in")
-                    }
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.back),
-                    tint = Color.Black
-                )
-            }
-        }
-    )
-}
-
-@Composable
-fun LoginScreenLogo() {
-    Text(text = stringResource(id = R.string.app_name), color = Color.Black, fontSize = 20.sp)
-    Spacer(modifier = Modifier.height(16.dp))
-}
-
-@Composable
-fun EmailStep(
-    email: MutableState<String>,
-    emailError: MutableState<String?>,
-    onNext: () -> Unit
-) {
-    TextField(
-        value = email.value,
-        onValueChange = { email.value = it },
-        label = { Text("Email Address") },
-        isError = emailError.value != null,
-        modifier = Modifier.fillMaxWidth()
-    )
-    emailError.value?.let {
-        Text(text = it, color = Color.Red, fontSize = 12.sp)
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Button(
-        onClick = onNext,
-        modifier = Modifier
-            .padding(16.dp, bottom = 16.dp)
-            .width(150.dp)
-            .height(50.dp),
-        shape = RectangleShape,
-    ) {
-        Text("Next", color = Color.White)
-    }
-}
-
-@Composable
-fun PasswordStep(
-    email: MutableState<String>,
-    password: MutableState<String>,
-    passwordError: MutableState<String?>,
-    passwordVisible: Boolean,
-    onPasswordVisibilityToggle: () -> Unit,
-    onSignIn: () -> Unit,
-    onForgotPassword: () -> Unit
-) {
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextField(
-        value = password.value,
-        onValueChange = { password.value = it },
-        label = { Text("Password") },
-        isError = passwordError.value != null,
-        modifier = Modifier.fillMaxWidth(),
-        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        trailingIcon = {
-            val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-            val description = if (passwordVisible) "Hide password" else "Show password"
-            IconButton(onClick = onPasswordVisibilityToggle) {
-                Icon(imageVector = image, contentDescription = description, tint = Color.Black)
-            }
-        }
-    )
-    passwordError.value?.let {
-        Text(text = it, color = Color.Red, fontSize = 12.sp)
-    }
-
-    Spacer(modifier = Modifier.height(32.dp))
-
-    Button(
-        onClick = onSignIn,
-        modifier = Modifier
-            .padding(16.dp, bottom = 16.dp)
-            .width(150.dp)
-            .height(50.dp),
-        shape = RectangleShape,
-    ) {
-        Text(text = stringResource(id = R.string.sign_in), color = Color.Black)
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextButton(onClick = onForgotPassword) {
-        Text("Trouble signing in?", color = Color.Black)
     }
 }
 

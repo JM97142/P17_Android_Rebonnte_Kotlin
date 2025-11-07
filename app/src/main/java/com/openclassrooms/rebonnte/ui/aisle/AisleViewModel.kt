@@ -5,7 +5,9 @@ import com.openclassrooms.rebonnte.models.Aisle
 import com.openclassrooms.rebonnte.repository.AisleRepository
 import kotlinx.coroutines.flow.StateFlow
 
-class AisleViewModel(val repository: AisleRepository) : ViewModel() {
+class AisleViewModel(
+    private val repository: AisleRepository
+) : ViewModel() {
     val aisles: StateFlow<List<Aisle>> = repository.aisles
 
 

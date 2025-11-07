@@ -66,11 +66,18 @@ fun MedicineDetailScreen(
         if (medicine == null) {
             Text(
                 text = "Loading medicine details...",
-                modifier = Modifier.padding(paddingValues).padding(16.dp)
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp)
             )
         } else {
-            Column(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
-                TextField(
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .padding(16.dp)
+            ) {
+                // Medicine Name (read-only)
+                OutlinedTextField(
                     value = medicine.name,
                     onValueChange = {},
                     label = { Text("Name") },
@@ -78,7 +85,9 @@ fun MedicineDetailScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                TextField(
+
+                // Aisle Name (read-only)
+                OutlinedTextField(
                     value = medicine.nameAisle,
                     onValueChange = {},
                     label = { Text("Aisle") },
@@ -87,6 +96,7 @@ fun MedicineDetailScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Stock controls
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -105,7 +115,8 @@ fun MedicineDetailScreen(
                     }) {
                         Icon(imageVector = Icons.Filled.KeyboardArrowDown, contentDescription = "Minus One")
                     }
-                    TextField(
+
+                    OutlinedTextField(
                         value = medicine.stock.toString(),
                         onValueChange = { newValue ->
                             val newStock = newValue.toIntOrNull() ?: medicine.stock
@@ -114,6 +125,7 @@ fun MedicineDetailScreen(
                         label = { Text("Stock") },
                         modifier = Modifier.weight(1f)
                     )
+
                     IconButton(onClick = {
                         val newStock = medicine.stock + 1
                         val updatedHistories = medicine.histories.toMutableList().apply {
@@ -129,6 +141,7 @@ fun MedicineDetailScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(text = "History", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(8.dp))
+
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(medicine.histories) { history ->
                         HistoryItem(history = history)

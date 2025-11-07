@@ -5,12 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,16 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.rememberDismissState
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.SwipeToDismiss
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.DismissDirection
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.DismissValue
-import androidx.compose.material3.MaterialTheme
 import com.openclassrooms.rebonnte.ui.medicine.composables.MedicineItem
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
@@ -35,8 +24,8 @@ fun MedicineScreen(
     navController: NavController,
     medicineViewModel: MedicineViewModel = koinViewModel()
 ) {
-
     val medicines by medicineViewModel.medicines.collectAsState(initial = emptyList())
+
     LaunchedEffect(medicines) {
         println("Medicines changed, forcing recomposition: $medicines")
     }
@@ -65,32 +54,24 @@ fun MedicineScreen(
                 )
             }
         }
-
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeToDeleteItem(
     onDelete: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val dismissState = rememberDismissState()
+    val swipeState = rememberSwipeToDismissBoxState()
     var showDialog by remember { mutableStateOf(false) }
-    var resetSwipe by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope() // Pour appeler snapTo
 
-    LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.isDismissed(DismissDirection.StartToEnd) ||
-            dismissState.isDismissed(DismissDirection.EndToStart)
+    LaunchedEffect(swipeState.currentValue) {
+        if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart ||
+            swipeState.currentValue == SwipeToDismissBoxValue.StartToEnd
         ) {
             showDialog = true
-        }
-    }
-
-    LaunchedEffect(resetSwipe) {
-        if (resetSwipe) {
-            dismissState.reset()
-            resetSwipe = false
         }
     }
 
@@ -98,7 +79,9 @@ fun SwipeToDeleteItem(
         AlertDialog(
             onDismissRequest = {
                 showDialog = false
-                resetSwipe = true
+                coroutineScope.launch {
+                    swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+                }
             },
             title = { Text("Confirm Deletion") },
             text = { Text("Are you sure you want to delete this item?") },
@@ -107,29 +90,39 @@ fun SwipeToDeleteItem(
                     onClick = {
                         showDialog = false
                         onDelete()
+                        coroutineScope.launch {
+                            swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+                        }
                     }
                 ) {
                     Text("Delete", color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    resetSwipe = true
-                }) {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        coroutineScope.launch {
+                            swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+                        }
+                    }
+                ) {
                     Text("Cancel")
                 }
             }
         )
     }
 
-    SwipeToDismiss(
-        state = dismissState,
-        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
-        background = {
-            val color = if (dismissState.targetValue == DismissValue.DismissedToStart ||
-                dismissState.targetValue == DismissValue.DismissedToEnd
-            ) Color.Red else MaterialTheme.colorScheme.surface
+    SwipeToDismissBox(
+        state = swipeState,
+        enableDismissFromStartToEnd = true,
+        enableDismissFromEndToStart = true,
+        backgroundContent = {
+            val color = when (swipeState.targetValue) {
+                SwipeToDismissBoxValue.EndToStart,
+                SwipeToDismissBoxValue.StartToEnd -> Color.Red
+                else -> MaterialTheme.colorScheme.surface
+            }
 
             Box(
                 modifier = Modifier
@@ -145,6 +138,6 @@ fun SwipeToDeleteItem(
                 )
             }
         },
-        dismissContent = { content() }
+        content = { content() }
     )
 }

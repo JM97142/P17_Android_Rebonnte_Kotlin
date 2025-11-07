@@ -2,18 +2,7 @@ package com.openclassrooms.rebonnte.ui.signin
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -92,9 +81,7 @@ fun GoogleLogInButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun EmailLogInButton(
-    onClick: () -> Unit
-) {
+fun EmailLogInButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier

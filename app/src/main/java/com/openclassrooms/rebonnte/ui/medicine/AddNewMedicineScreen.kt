@@ -32,8 +32,7 @@ fun AddNewMedicineScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Add Medicine") },
+            TopAppBar(title = { Text("Add Medicine") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(

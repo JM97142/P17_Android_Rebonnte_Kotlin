@@ -11,13 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -79,14 +77,18 @@ fun RecoveryScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordRecoveryTopBar(navController: NavController) {
-    TopAppBar(
-        title = { Text(text = stringResource(id = R.string.password_recovery), color = Color.Black) },
+    TopAppBar(title = {
+        Text(
+            text = stringResource(id = R.string.password_recovery),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    },
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.back),
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -148,8 +150,6 @@ fun EmailInputField(email: MutableState<TextFieldValue>, emailError: MutableStat
             errorIndicatorColor = Color.Black,
             focusedLabelColor = Color.Black,
             unfocusedLabelColor = Color.Black,
-            focusedContainerColor = colorResource(id = R.color.teal_700),
-            unfocusedContainerColor = colorResource(id = R.color.teal_700),
             disabledContainerColor = Color.LightGray,
             errorContainerColor = Color.Red
         ),

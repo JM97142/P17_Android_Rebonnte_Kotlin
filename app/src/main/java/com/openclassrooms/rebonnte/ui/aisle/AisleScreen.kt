@@ -7,29 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.DismissDirection
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.DismissValue
-import androidx.compose.material.ExperimentalMaterialApi
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-//noinspection UsingMaterialAndMaterial3Libraries
-import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,9 +25,6 @@ fun AisleScreen(
     aisleViewModel: AisleViewModel = koinViewModel()
 ) {
     val aisles by aisleViewModel.aisles.collectAsState(initial = emptyList())
-    LaunchedEffect(aisles) {
-        println("Aisles changed, forcing recomposition: $aisles")
-    }
 
     BackHandler(enabled = true) {
         navController.navigate("medicine") {
@@ -69,40 +47,28 @@ fun AisleScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeToDeleteItem(
     onDelete: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val dismissState = rememberDismissState()
+    val swipeState = rememberSwipeToDismissBoxState()
     var showDialog by remember { mutableStateOf(false) }
-    var resetSwipe by remember { mutableStateOf(false) }
 
-    // Observe dismiss state and show the dialog when swiped
-    LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.isDismissed(DismissDirection.StartToEnd) ||
-            dismissState.isDismissed(DismissDirection.EndToStart)
+    // Observe swipe state
+    LaunchedEffect(swipeState.currentValue) {
+        if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart ||
+            swipeState.currentValue == SwipeToDismissBoxValue.StartToEnd
         ) {
             showDialog = true
-        }
-    }
-
-    // Reset the swipe
-    LaunchedEffect(resetSwipe) {
-        if (resetSwipe) {
-            dismissState.reset()
-            resetSwipe = false
         }
     }
 
     // Confirmation Dialog
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = {
-                showDialog = false
-                resetSwipe = true
-            },
+            onDismissRequest = { showDialog = false },
             title = { Text("Confirm Deletion") },
             text = { Text("Are you sure you want to delete this item?") },
             confirmButton = {
@@ -116,23 +82,20 @@ fun SwipeToDeleteItem(
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    resetSwipe = true
-                }) {
+                TextButton(onClick = { showDialog = false }) {
                     Text("Cancel")
                 }
             }
         )
     }
 
-    SwipeToDismiss(
-        state = dismissState,
-        directions = setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
-        background = {
-            val color = if (dismissState.targetValue == DismissValue.DismissedToStart ||
-                dismissState.targetValue == DismissValue.DismissedToEnd
-            ) Color.Red else MaterialTheme.colorScheme.surface
+    SwipeToDismissBox(
+        state = swipeState,
+        backgroundContent = {
+            val color = when (swipeState.dismissDirection) {
+                SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> Color.Red
+                else -> MaterialTheme.colorScheme.surface
+            }
 
             Box(
                 modifier = Modifier
@@ -148,6 +111,6 @@ fun SwipeToDeleteItem(
                 )
             }
         },
-        dismissContent = { content() }
+        content = { content() }
     )
 }

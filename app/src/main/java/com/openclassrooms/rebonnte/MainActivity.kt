@@ -1,9 +1,12 @@
 package com.openclassrooms.rebonnte
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -76,6 +79,11 @@ fun MyApp(
     val navController = rememberNavController()
     val medicineViewModel: MedicineViewModel = koinViewModel()
     val aisleViewModel: AisleViewModel = koinViewModel()
+
+    // States de recherche stables
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -83,68 +91,59 @@ fun MyApp(
         Scaffold(
             topBar = {
                 if (currentRoute in listOf("aisle", "medicine")) {
-                    var isSearchActive by rememberSaveable { mutableStateOf(false) }
-                    var searchQuery by remember { mutableStateOf("") }
-
-                    Column(verticalArrangement = Arrangement.spacedBy((-1).dp)) {
-                        TopAppBar(
-                            title = { if (currentRoute == "aisle") Text("Aisle") else Text("Medicines") },
-                            actions = {
+                    TopAppBar(
+                        title = { Text(if (currentRoute == "aisle") "Aisles" else "Medicines") },
+                        actions = {
+                            if (currentRoute == "medicine") {
                                 var expanded by remember { mutableStateOf(false) }
-                                if (currentRoute == "medicine") {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.padding(end = 8.dp)
-                                            .background(MaterialTheme.colorScheme.surface)
-                                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                                Box {
+                                    IconButton(onClick = { expanded = true }) {
+                                        Icon(Icons.Default.MoreVert, contentDescription = "Sort options")
+                                    }
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }
                                     ) {
-                                        Box {
-                                            IconButton(onClick = { expanded = true }) {
-                                                Icon(Icons.Default.MoreVert, contentDescription = null)
+                                        DropdownMenuItem(
+                                            text = { Text("Sort by None") },
+                                            onClick = {
+                                                medicineViewModel.sortByNone()
+                                                expanded = false
                                             }
-                                            DropdownMenu(
-                                                expanded = expanded,
-                                                onDismissRequest = { expanded = false },
-                                                offset = DpOffset(x = 0.dp, y = 0.dp)
-                                            ) {
-                                                DropdownMenuItem(
-                                                    text = { Text("Sort by None") },
-                                                    onClick = {
-                                                        medicineViewModel.sortByNone()
-                                                        expanded = false
-                                                    }
-                                                )
-                                                DropdownMenuItem(
-                                                    text = { Text("Sort by Name") },
-                                                    onClick = {
-                                                        medicineViewModel.sortByName()
-                                                        expanded = false
-                                                    }
-                                                )
-                                                DropdownMenuItem(
-                                                    text = { Text("Sort by Stock") },
-                                                    onClick = {
-                                                        medicineViewModel.sortByStock()
-                                                        expanded = false
-                                                    }
-                                                )
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Sort by Name") },
+                                            onClick = {
+                                                medicineViewModel.sortByName()
+                                                expanded = false
                                             }
-                                        }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Sort by Stock") },
+                                            onClick = {
+                                                medicineViewModel.sortByStock()
+                                                expanded = false
+                                            }
+                                        )
                                     }
                                 }
                             }
+                        },
+                        colors = TopAppBarDefaults.mediumTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
                         )
-                        if (currentRoute == "medicine") {
-                            EmbeddedSearchBar(
-                                query = searchQuery,
-                                onQueryChange = { newQuery ->
-                                    medicineViewModel.filterByName(newQuery)
-                                    searchQuery = newQuery
-                                },
-                                isSearchActive = isSearchActive,
-                                onActiveChanged = { isSearchActive = it }
-                            )
-                        }
+                    )
+
+                    if (currentRoute == "medicine") {
+                        EmbeddedSearchBar(
+                            query = searchQuery,
+                            onQueryChange = { newQuery ->
+                                searchQuery = newQuery
+                                medicineViewModel.filterByName(newQuery)
+                            },
+                            isSearchActive = isSearchActive,
+                            onActiveChanged = { isSearchActive = it }
+                        )
                     }
                 }
             },
@@ -156,17 +155,16 @@ fun MyApp(
                         googleAuthUiClient = googleAuthUiClient,
                         emailAuthClient = emailAuthClient,
                         aisleViewModel = aisleViewModel,
-                        onSignOut = { /* ... */ }
+                        onSignOut = {}
                     )
                 }
             },
             floatingActionButton = {
                 if (currentRoute in listOf("aisle", "medicine")) {
                     FloatingActionButton(onClick = {
-                        if (currentRoute == "medicine") {
-                            navController.navigate("add_medicine")
-                        } else if (currentRoute == "aisle") {
-                            aisleViewModel.addRandomAisle()
+                        when (currentRoute) {
+                            "medicine" -> navController.navigate("add_medicine")
+                            "aisle" -> aisleViewModel.addRandomAisle()
                         }
                     }) {
                         Icon(Icons.Default.Add, contentDescription = "Add")
@@ -175,45 +173,32 @@ fun MyApp(
             }
         ) { paddingValues ->
             NavHost(
-                modifier = Modifier.padding(paddingValues),
                 navController = navController,
-                startDestination = "sign_in"
+                startDestination = "sign_in",
+                modifier = Modifier.padding(paddingValues)
             ) {
                 appNavigation(navController, googleAuthUiClient, emailAuthClient, lifecycleScope)
                 composable("aisle") { AisleScreen(navController, aisleViewModel) }
                 composable("medicine") { MedicineScreen(navController, medicineViewModel) }
+
                 composable("aisle_detail/{aisleName}") { backStackEntry ->
-                    val aisleName = backStackEntry.arguments?.getString("aisleName") ?: "Unknown"
-                    AisleDetailScreen(
-                        name = aisleName,
-                        viewModel = medicineViewModel,
-                        navController = navController
-                    )
+                    val aisleName = backStackEntry.arguments?.getString("aisleName")?.let { Uri.decode(it) } ?: "Unknown"
+                    AisleDetailScreen(aisleName, medicineViewModel, navController)
                 }
+
                 composable("medicine_detail/{medicineName}") { backStackEntry ->
-                    val medicineName = backStackEntry.arguments?.getString("medicineName") ?: "Unknown"
-                    MedicineDetailScreen(
-                        name = medicineName,
-                        viewModel = medicineViewModel,
-                        onBack = { navController.popBackStack() }
-                    )
+                    val medicineName = backStackEntry.arguments?.getString("medicineName")?.let { Uri.decode(it) } ?: "Unknown"
+                    MedicineDetailScreen(medicineName, medicineViewModel) {
+                        navController.popBackStack()
+                    }
                 }
+
                 composable("add_medicine") {
-                    AddNewMedicineScreen(
-                        navController = navController,
-                        medicineViewModel = medicineViewModel,
-                        aisleViewModel = aisleViewModel
-                    )
+                    AddNewMedicineScreen(navController, medicineViewModel, aisleViewModel)
                 }
             }
         }
     }
-}
-
-@Composable
-fun currentRoute(navController: NavController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
 }
 
 @Composable
@@ -224,65 +209,33 @@ fun EmbeddedSearchBar(
     onActiveChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var searchQuery by rememberSaveable { mutableStateOf(query) }
-    val activeChanged: (Boolean) -> Unit = { active ->
-        searchQuery = ""
-        onQueryChange("")
-        onActiveChanged(active)
-    }
-    val shape: Shape = RoundedCornerShape(16.dp)
-
-    Row(
-        modifier = modifier.fillMaxWidth().height(48.dp).padding(horizontal = 16.dp)
-            .clip(shape).background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (isSearchActive) {
-            IconButton(onClick = { activeChanged(false) }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        } else {
+    TextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        placeholder = { Text("Search") },
+        leadingIcon = {
             Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        BasicTextField(
-            value = searchQuery,
-            onValueChange = { newQuery ->
-                searchQuery = newQuery
-                onQueryChange(newQuery)
-            },
-            modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-            singleLine = true,
-            decorationBox = { innerTextField ->
-                if (searchQuery.isEmpty()) {
-                    Text(
-                        text = "Search",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                    )
+                imageVector = if (isSearchActive) Icons.AutoMirrored.Rounded.ArrowBack else Icons.Rounded.Search,
+                contentDescription = if (isSearchActive) "Close search" else "Search icon",
+                modifier = Modifier.clickable(
+                    indication = null,  // pas d'effet de ripple pour éviter le conflit
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onActiveChanged(!isSearchActive)
                 }
-                innerTextField()
+            )
+        },
+        trailingIcon = {
+            if (isSearchActive && query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Rounded.Close, contentDescription = "Clear search")
+                }
             }
-        )
-        if (isSearchActive && searchQuery.isNotEmpty()) {
-            IconButton(onClick = {
-                searchQuery = ""
-                onQueryChange("")
-            }) {
-                Icon(
-                    imageVector = Icons.Rounded.Close,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(16.dp)
+    )
 }
