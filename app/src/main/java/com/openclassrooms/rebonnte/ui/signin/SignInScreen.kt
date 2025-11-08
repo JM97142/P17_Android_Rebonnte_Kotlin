@@ -56,10 +56,6 @@ fun SignInScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        GoogleLogInButton { onGoogleSignInClick() }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         EmailLogInButton { onEmailSignInClick() }
     }
 }

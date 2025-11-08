@@ -95,4 +95,30 @@ class MedicineDetailScreenTest {
 
         composeTestRule.onNodeWithText("Loading medicine details...").assertIsDisplayed()
     }
+
+    @Test
+    fun plus_and_minus_buttons_update_stock() {
+        // Liste pour capturer tous les appels à updateMedicine
+        val updatedMedicines = mutableListOf<Medicine>()
+        val customViewModel = mockk<MedicineViewModel>(relaxed = true) {
+            every { medicines } returns medicinesFlow
+            every { updateMedicine(capture(updatedMedicines)) } answers {}
+        }
+
+        composeTestRule.setContent {
+            MedicineDetailScreen(name = "Aspirin", viewModel = customViewModel) { backCalled = true }
+        }
+
+        // Clique sur "+"
+        composeTestRule.onNodeWithContentDescription("Plus One").performClick()
+        composeTestRule.runOnIdle {
+            assert(updatedMedicines.last().stock == 11)
+        }
+
+        // Clique sur "-"
+        composeTestRule.onNodeWithContentDescription("Minus One").performClick()
+        composeTestRule.runOnIdle {
+            assert(updatedMedicines.last().stock == 10)
+        }
+    }
 }

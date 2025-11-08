@@ -3,6 +3,7 @@ package com.openclassrooms.rebonnte.ui.composables
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,57 +50,63 @@ fun UiApp(
     Scaffold(
         topBar = {
             if (currentRoute in listOf("aisle", "medicine")) {
-                TopAppBar(
-                    title = { Text(if (currentRoute == "aisle") "Aisles" else "Medicines") },
-                    actions = {
-                        if (currentRoute == "medicine") {
-                            var expanded by remember { mutableStateOf(false) }
-                            Box {
-                                IconButton(onClick = { expanded = true }) {
-                                    Icon(Icons.Default.MoreVert, contentDescription = "Sort options")
-                                }
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false }
-                                ) {
-                                    DropdownMenuItem(
-                                        text = { Text("Sort by None") },
-                                        onClick = {
-                                            medicineViewModel.sortByNone()
-                                            expanded = false
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("Sort by Name") },
-                                        onClick = {
-                                            medicineViewModel.sortByName()
-                                            expanded = false
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("Sort by Stock") },
-                                        onClick = {
-                                            medicineViewModel.sortByStock()
-                                            expanded = false
-                                        }
-                                    )
+                Column {
+                    TopAppBar(
+                        title = { Text(if (currentRoute == "aisle") "Aisles" else "Medicines") },
+                        actions = {
+                            if (currentRoute == "medicine") {
+                                var expanded by remember { mutableStateOf(false) }
+                                Box {
+                                    IconButton(onClick = { expanded = true }) {
+                                        Icon(Icons.Default.MoreVert, contentDescription = "Sort options")
+                                    }
+                                    DropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Sort by None") },
+                                            onClick = {
+                                                medicineViewModel.sortByNone()
+                                                expanded = false
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Sort by Name") },
+                                            onClick = {
+                                                medicineViewModel.sortByName()
+                                                expanded = false
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("Sort by Stock") },
+                                            onClick = {
+                                                medicineViewModel.sortByStock()
+                                                expanded = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors()
-                )
-
-                if (currentRoute == "medicine") {
-                    EmbeddedSearchBar(
-                        query = searchQuery,
-                        onQueryChange = { newQuery ->
-                            searchQuery = newQuery
-                            medicineViewModel.filterByName(newQuery)
                         },
-                        isSearchActive = isSearchActive,
-                        onActiveChanged = { isSearchActive = it }
+                        colors = TopAppBarDefaults.mediumTopAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
                     )
+
+                    // On affiche la SearchBar uniquement pour "medicine"
+                    if (currentRoute == "medicine") {
+                        EmbeddedSearchBar(
+                            query = searchQuery,
+                            onQueryChange = { newQuery ->
+                                searchQuery = newQuery
+                                medicineViewModel.filterByName(newQuery)
+                            },
+                            isSearchActive = isSearchActive,
+                            onActiveChanged = { isSearchActive = it },
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
                 }
             }
         },
