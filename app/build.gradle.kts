@@ -62,7 +62,15 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.addAll(
+                listOf(
+                    "META-INF/LICENSE.md",
+                    "META-INF/LICENSE-notice.md",
+                    "META-INF/NOTICE.md",
+                    "META-INF/LICENSE.txt",
+                    "META-INF/NOTICE.txt"
+                )
+            )
         }
     }
 }
@@ -145,7 +153,6 @@ dependencies {
     implementation(libs.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
@@ -162,7 +169,6 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     // Test
     testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.ui.test)
     androidTestImplementation(libs.mockk.android)
@@ -171,7 +177,6 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.inline)
     testImplementation (libs.google.firebase.firestore)
-    testImplementation (libs.mockito.core.v451)
     testImplementation (libs.core.testing)
     testImplementation (libs.mockk)
     debugImplementation(libs.ui.test.manifest)

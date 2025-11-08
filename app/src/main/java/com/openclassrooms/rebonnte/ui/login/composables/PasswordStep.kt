@@ -28,10 +28,11 @@ import com.openclassrooms.rebonnte.R
 
 @Composable
 fun PasswordStep(
-    email: MutableState<String>,
-    password: MutableState<String>,
-    passwordError: MutableState<String?>,
+    email: String,
+    password: String,
+    passwordError: String?,
     passwordVisible: Boolean,
+    onPasswordChange: (String) -> Unit,
     onPasswordVisibilityToggle: () -> Unit,
     onSignIn: () -> Unit,
     onForgotPassword: () -> Unit
@@ -39,10 +40,10 @@ fun PasswordStep(
     Spacer(modifier = Modifier.height(16.dp))
 
     TextField(
-        value = password.value,
-        onValueChange = { password.value = it },
+        value = password,
+        onValueChange = onPasswordChange,
         label = { Text("Password") },
-        isError = passwordError.value != null,
+        isError = passwordError != null,
         modifier = Modifier.fillMaxWidth(),
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
@@ -53,7 +54,8 @@ fun PasswordStep(
             }
         }
     )
-    passwordError.value?.let {
+
+    passwordError?.let {
         Text(text = it, color = Color.Red, fontSize = 12.sp)
     }
 
@@ -67,7 +69,7 @@ fun PasswordStep(
             .height(50.dp),
         shape = RectangleShape,
     ) {
-        Text(text = stringResource(id = R.string.sign_in), color = Color.Black)
+        Text(text = "Sign In", color = Color.Black)
     }
 
     Spacer(modifier = Modifier.height(16.dp))

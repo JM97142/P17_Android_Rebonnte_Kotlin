@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.openclassrooms.rebonnte.repository.AisleRepository
 import com.openclassrooms.rebonnte.repository.MedicineRepository
 import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
+import com.openclassrooms.rebonnte.ui.login.LoginViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.signin.SignInViewModel
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
@@ -17,6 +18,7 @@ import org.koin.dsl.module
 
 val appModule = module {
     single { FirebaseFirestore.getInstance() }
+    single { com.google.firebase.auth.FirebaseAuth.getInstance() }
 
     single<SharedPreferences> {
         get<Context>().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
@@ -26,6 +28,7 @@ val appModule = module {
     }
     single { EmailAuthClient() }
 
+    viewModel { LoginViewModel(get()) }
     viewModel { AisleViewModel(get()) }
     viewModel { MedicineViewModel(get()) }
     viewModel { SignInViewModel(get(), get()) }

@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -32,7 +33,10 @@ fun AddNewMedicineScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Add Medicine") },
+            TopAppBar(title = {
+                Text("Add Medicine",
+                    modifier = Modifier.testTag("topBarTitle")
+                ) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -57,7 +61,9 @@ fun AddNewMedicineScreen(
                 value = name,
                 onValueChange = { name = it },
                 label = { Text("Medicine Name") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("addNameMedicineField")
             )
 
             // Stock
@@ -66,18 +72,22 @@ fun AddNewMedicineScreen(
                 onValueChange = { if (it.all { char -> char.isDigit() }) stock = it },
                 label = { Text("Stock") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("addStockMedicineField")
             )
 
             // Aisle Picker
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("aisleDropdown")
             ) {
                 TextField(
                     value = selectedAisle,
-                    onValueChange = { /* Read-only; selection handled by dropdown */ },
+                    onValueChange = { },
                     label = { Text("Aisle Name") },
                     readOnly = true,
                     trailingIcon = {
@@ -86,6 +96,7 @@ fun AddNewMedicineScreen(
                     modifier = Modifier
                         .menuAnchor()
                         .fillMaxWidth()
+                        .testTag("aisleField")
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -94,7 +105,7 @@ fun AddNewMedicineScreen(
                     if (aisles.isEmpty()) {
                         DropdownMenuItem(
                             text = { Text("No aisles available") },
-                            onClick = { /* Do nothing */ }
+                            onClick = { }
                         )
                     } else {
                         aisles.forEach { aisle ->
@@ -103,7 +114,9 @@ fun AddNewMedicineScreen(
                                 onClick = {
                                     selectedAisle = aisle.name
                                     expanded = false
-                                }
+                                },
+                                modifier = Modifier
+                                    .testTag("aisleItem_${aisle.name}")
                             )
                         }
                     }
@@ -130,7 +143,9 @@ fun AddNewMedicineScreen(
                         navController.popBackStack()
                     }
                 },
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .testTag("addMedicineButton")
             ) {
                 Text("Add Medicine")
             }

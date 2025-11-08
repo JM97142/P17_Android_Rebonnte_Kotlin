@@ -18,18 +18,19 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun EmailStep(
-    email: MutableState<String>,
-    emailError: MutableState<String?>,
+    email: String,
+    emailError: String?,
+    onEmailChange: (String) -> Unit,
     onNext: () -> Unit
 ) {
     TextField(
-        value = email.value,
-        onValueChange = { email.value = it },
+        value = email,
+        onValueChange = onEmailChange,
         label = { Text("Email Address") },
-        isError = emailError.value != null,
+        isError = emailError != null,
         modifier = Modifier.fillMaxWidth()
     )
-    emailError.value?.let {
+    emailError?.let {
         Text(text = it, color = Color.Red, fontSize = 12.sp)
     }
 

@@ -5,17 +5,21 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
-import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.openclassrooms.rebonnte.ui.aisle.AisleDetailScreen
+import com.openclassrooms.rebonnte.ui.aisle.AisleScreen
 import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
 import com.openclassrooms.rebonnte.ui.login.EmailScreen
 import com.openclassrooms.rebonnte.ui.login.LogInScreen
+import com.openclassrooms.rebonnte.ui.login.LoginViewModel
 import com.openclassrooms.rebonnte.ui.login.RecoveryScreen
+import com.openclassrooms.rebonnte.ui.medicine.AddNewMedicineScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineDetailScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
@@ -27,97 +31,89 @@ import com.openclassrooms.rebonnte.utils.GoogleAuthClient
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-fun NavGraphBuilder.appNavigation(
-    navController: NavController,
+@Composable
+fun AppNavGraph(
+    navController: NavHostController,
+    loginViewModel: LoginViewModel,
+    aisleViewModel: AisleViewModel,
+    medicineViewModel: MedicineViewModel,
     googleAuthClient: GoogleAuthClient,
     emailAuthClient: EmailAuthClient,
-    lifecycleScope: LifecycleCoroutineScope
+    modifier: Modifier = Modifier
 ) {
-    composable("sign_in") {
-        val viewModel: SignInViewModel = koinViewModel()
-        val state by viewModel.state.collectAsStateWithLifecycle()
+    NavHost(
+        navController = navController,
+        startDestination = "sign_in",
+        modifier = modifier
+    ) {
 
-        SignInScreen(
-            state = state,
-            onGoogleSignInClick = { navController.navigate("google_sign_in") },
-            onEmailSignInClick = { navController.navigate("email_sign_in") }
-        )
-    }
+        composable("sign_in") {
+            val viewModel: SignInViewModel = koinViewModel()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            SignInScreen(
+                state = state,
+                onGoogleSignInClick = { navController.navigate("google_sign_in") },
+                onEmailSignInClick = { navController.navigate("email_sign_in") }
+            )
+        }
 
-    composable("google_sign_in") {
-        val viewModel: SignInViewModel = koinViewModel()
-        val state by viewModel.state.collectAsStateWithLifecycle()
-        val googleSignInLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartIntentSenderForResult(),
-            onResult = { result ->
-                if (result.resultCode == RESULT_OK) {
-                    lifecycleScope.launch {
-                        val signInResult = googleAuthClient.signInWithIntent(result.data ?: return@launch)
-                        viewModel.onSignInResult(signInResult)
-                        if (signInResult.data != null) {
-                            navController.navigate("aisle") {
+        composable("google_sign_in") {
+            val viewModel: SignInViewModel = koinViewModel()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            val lifecycleScope = rememberCoroutineScope()
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartIntentSenderForResult(),
+                onResult = { result ->
+                    if (result.resultCode == RESULT_OK) {
+                        lifecycleScope.launch {
+                            val res = googleAuthClient.signInWithIntent(result.data ?: return@launch)
+                            viewModel.onSignInResult(res)
+                            if (res.data != null) navController.navigate("aisle") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                                 launchSingleTop = true
                             }
                         }
                     }
                 }
-            }
-        )
+            )
 
-        LaunchedEffect(Unit) {
-            googleAuthClient.signIn()?.let { intentSender ->
-                googleSignInLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
+            LaunchedEffect(Unit) {
+                googleAuthClient.signIn()?.let { launcher.launch(IntentSenderRequest.Builder(it).build()) }
             }
         }
-    }
 
-    composable("email_sign_in") {
-        EmailScreen(
-            onLogInClick = { navController.navigate("login") },
-            onSignUpClick = { navController.navigate("signup") },
+        composable("email_sign_in") {
+            EmailScreen(
+                onLogInClick = { navController.navigate("login") },
+                onSignUpClick = { navController.navigate("signup") },
+                navController = navController)
+        }
+
+        composable("login") {
+            LogInScreen(
+                navController = navController,
+                viewModel = loginViewModel)
+        }
+
+        composable("password_recovery") { RecoveryScreen(navController) }
+
+        composable("signup") { SignUpScreen(
+            onLoginSuccess = { navController.navigate("aisle") { popUpTo("signup") { inclusive = true } } },
             navController = navController
-        )
-    }
+        ) }
 
-    composable("aisle") {
-        val aisleViewModel: AisleViewModel = koinViewModel()
-    }
+        composable("aisle") { AisleScreen(navController, aisleViewModel) }
+        composable("aisle_detail/{aisleName}", arguments = listOf(navArgument("aisleName") { type = NavType.StringType })) { backStackEntry ->
+            val aisleName = backStackEntry.arguments?.getString("aisleName") ?: "Unknown"
+            AisleDetailScreen(aisleName, medicineViewModel, navController)
+        }
 
-    composable("medicine") {
-        val medicineViewModel: MedicineViewModel = koinViewModel()
-        MedicineScreen(navController, medicineViewModel)
-    }
+        composable("medicine") { MedicineScreen(navController, medicineViewModel) }
+        composable("medicine_detail/{medicineName}", arguments = listOf(navArgument("medicineName") { type = NavType.StringType })) { backStackEntry ->
+            val medicineName = backStackEntry.arguments?.getString("medicineName") ?: "Unknown"
+            MedicineDetailScreen(medicineName, medicineViewModel) { navController.popBackStack() }
+        }
 
-    composable("signup") {
-        SignUpScreen(
-            onLoginSuccess = {
-                navController.navigate("aisle") {
-                    popUpTo("signup") { inclusive = true }
-                }
-            },
-            navController = navController
-        )
-    }
-
-    composable("login") {
-        LogInScreen(navController = navController)
-    }
-
-    composable("password_recovery") {
-        RecoveryScreen(navController = navController)
-    }
-
-    composable(
-        "medicine_detail/{medicineName}",
-        arguments = listOf(navArgument("medicineName") { type = NavType.StringType })
-    ) { backStackEntry ->
-        val medicineName = backStackEntry.arguments?.getString("medicineName") ?: "Unknown"
-        val medicineViewModel: MedicineViewModel = koinViewModel()
-        MedicineDetailScreen(
-            name = medicineName,
-            viewModel = medicineViewModel,
-            onBack = { navController.popBackStack() }
-        )
+        composable("add_medicine") { AddNewMedicineScreen(navController, medicineViewModel, aisleViewModel) }
     }
 }
