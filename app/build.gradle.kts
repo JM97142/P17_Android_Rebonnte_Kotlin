@@ -1,3 +1,5 @@
+import com.android.build.gradle.BaseExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -5,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt)
     id("com.google.gms.google-services")
     id("dagger.hilt.android.plugin")
+    id("jacoco")
 }
 
 android {
@@ -30,6 +33,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -57,6 +65,62 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+// Jacoco config
+val androidExtension = extensions.getByType<BaseExtension>()
+tasks.register<JacocoReport>("jacocoUnitTestReport") {
+    dependsOn("testDebugUnitTest")
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for unit tests (debug)"
+
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/jacocoUnitTestReport/jacocoUnitTestReport.xml"))
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/jacocoUnitTestReport/html"))
+    }
+
+    val mainSrc = files("src/main/java")
+
+    val javaClasses = fileTree("build/intermediates/javac/debug/classes") {
+        exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
+    }
+    val kotlinClasses = fileTree("build/tmp/kotlin-classes/debug") {
+        exclude("**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*", "**/*Test*.*")
+    }
+
+    classDirectories.setFrom(files(javaClasses, kotlinClasses))
+    sourceDirectories.setFrom(mainSrc)
+
+    // Seuls les tests unitaires produisent le .exec
+    executionData.setFrom(fileTree("build/outputs/unit_test_code_coverage/debugUnitTest") {
+        include("*.exec")
+    })
+}
+// Rapport pour les tests instrumentés
+tasks.register<JacocoReport>("jacocoAndroidTestReport") {
+    dependsOn("connectedDebugAndroidTest") // lance les tests instrumentés sur un émulateur
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for instrumentation tests"
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"))
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/jacocoAndroidTestReport/html"))
+    }
+    val mainSrc = files("src/main/java")
+    val javaClasses = fileTree("build/intermediates/javac/debug/classes") {
+        exclude("**/R.class","**/R$*.class","**/BuildConfig.*","**/Manifest*.*","**/*Test*.*")
+    }
+    val kotlinClasses = fileTree("build/tmp/kotlin-classes/debug") {
+        exclude("**/R.class","**/R$*.class","**/BuildConfig.*","**/Manifest*.*","**/*Test*.*")
+    }
+    classDirectories.setFrom(files(javaClasses,kotlinClasses))
+    sourceDirectories.setFrom(mainSrc)
+    executionData.setFrom(fileTree("build/outputs/code_coverage/debugAndroidTest/connected") {
+        include("**/*.ec") // fichiers générés par les tests instrumentés
+    })
 }
 
 dependencies {
