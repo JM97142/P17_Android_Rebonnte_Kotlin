@@ -100,7 +100,6 @@ fun signInWithEmail(auth: FirebaseAuth, email: String, password: String, navCont
                 navController.navigate("aisle") {
                     popUpTo(0) { inclusive = true }
                 }
-                Toast.makeText(navController.context, "Sign in successful", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(navController.context, "Authentication failed", Toast.LENGTH_SHORT).show()
             }

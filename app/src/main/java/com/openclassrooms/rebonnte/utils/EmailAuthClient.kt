@@ -12,7 +12,7 @@ class EmailAuthClient {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             SignInResult(
                 data = result.user?.run {
-                    Userdata(
+                    UserData(
                         userId = uid,
                         userName = displayName ?: "",
                         email = email,
@@ -39,7 +39,7 @@ class EmailAuthClient {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             SignInResult(
                 data = result.user?.run {
-                    Userdata(
+                    UserData(
                         userId = uid,
                         userName = email,
                         email = email,
@@ -66,9 +66,9 @@ class EmailAuthClient {
         auth.signOut()
     }
 
-    fun getSignedInUser(): Userdata? = auth.currentUser?.run {
+    fun getSignedInUser(): UserData? = auth.currentUser?.run {
         email?.let {
-            Userdata(
+            UserData(
                 userId = uid,
                 userName = displayName ?: email ?: "",
                 email = it,

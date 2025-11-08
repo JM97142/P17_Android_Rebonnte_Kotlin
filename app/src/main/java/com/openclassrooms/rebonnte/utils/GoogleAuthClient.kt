@@ -38,7 +38,7 @@ class GoogleAuthClient(
             SignInResult(
                 data = user?.run {
                     email?.let {
-                        Userdata(
+                        UserData(
                             userId = user.uid,
                             userName = displayName.toString(),
                             email = it,
@@ -67,8 +67,8 @@ class GoogleAuthClient(
         }
     }
 
-    fun getSignedInUser(): Userdata? = auth.currentUser?.run {
-        Userdata(
+    fun getSignedInUser(): UserData? = auth.currentUser?.run {
+        UserData(
             userId = uid,
             userName = displayName ?: "",
             email = email ?: "",

@@ -8,115 +8,149 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MedicineRepository(private val firestore: FirebaseFirestore) {
-    private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
-    val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
-    private val MEDICINES_COLLECTION = "medicines"
-    private var listenerRegistration: ListenerRegistration? = null
-
-    init {
-        loadMedicines()
+class MedicineRepository(
+    private val firestore: FirebaseFirestore
+) {
+    companion object {
+        private const val MEDICINES_COLLECTION = "medicines"
     }
 
-    fun loadMedicines() {
+    private var listenerRegistration: ListenerRegistration? = null
+
+    private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
+    val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
+
+    init {
+        observeMedicines()
+    }
+
+    /**
+     * Observe toutes les modifications Firestore en temps réel.
+     */
+    private fun observeMedicines(
+        query: Query = firestore.collection(MEDICINES_COLLECTION)
+    ) {
+        // Évite les doublons de listeners
         listenerRegistration?.remove()
-        println("Attaching new medicine snapshot listener")
-        listenerRegistration = firestore.collection(MEDICINES_COLLECTION)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    println("Medicine snapshot listener error: ${e.message}")
-                    return@addSnapshotListener
+
+        listenerRegistration = query.addSnapshotListener { snapshot, error ->
+            when {
+                error != null -> {
+                    println("Firestore listener error: ${error.message}")
                 }
-                if (snapshot == null) {
-                    println("Medicine snapshot is null")
-                    return@addSnapshotListener
+                snapshot != null -> {
+                    val medList = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(Medicine::class.java)?.copy(id = doc.id)
+                    }
+                    _medicines.value = medList
+                    println("Medicines updated: ${medList.size} items")
                 }
-                val medList = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(Medicine::class.java)?.copy(id = doc.id)
-                }
-                println("Medicines updated: $medList")
-                _medicines.value = medList
+                else -> println("Snapshot null without error.")
+            }
+        }
+    }
+
+    /**
+     * Ajoute un nouveau médicament dans Firestore.
+     */
+    fun addNewMedicine(medicine: Medicine) {
+        val docRef = firestore.collection(MEDICINES_COLLECTION).document()
+        val medicineWithId = medicine.copy(id = docRef.id)
+
+        // Ajout dans le StateFlow pour réactivité UI
+        _medicines.value = _medicines.value + medicineWithId
+
+        // Envoi vers Firestore
+        docRef.set(medicineWithId)
+            .addOnSuccessListener {
+                println("Medicine added: ${medicineWithId.name} (ID: ${medicineWithId.id})")
+            }
+            .addOnFailureListener { e ->
+                println("Failed to add medicine: ${e.message}")
+                // En cas d'échec Firestore, on retire l'élément ajouté localement
+                _medicines.value = _medicines.value.filterNot { it.id == medicineWithId.id }
             }
     }
 
-    fun addNewMedicine(medicine: Medicine) {
-        val newDocRef = firestore.collection(MEDICINES_COLLECTION).document()
-        val medicineWithId = medicine.copy(id = newDocRef.id)
-        newDocRef
-            .set(medicineWithId)
-            .addOnSuccessListener { println("Medicine added: ${medicineWithId.name}, ID: ${medicineWithId.id}") }
-            .addOnFailureListener { e -> println("Failed to add medicine: ${e.message}") }
-    }
-
+    /**
+     * Met à jour un médicament existant.
+     */
     fun updateMedicine(medicine: Medicine) {
         if (medicine.id.isEmpty()) {
-            println("Error: Cannot update medicine with empty ID")
+            println("Cannot update medicine with empty ID.")
             return
         }
-        println("Updating Medicine: ${medicine.name}, Stock: ${medicine.stock}, Histories: ${medicine.histories}")
+
         firestore.collection(MEDICINES_COLLECTION)
             .document(medicine.id)
             .set(medicine)
             .addOnSuccessListener {
-                loadMedicines()
+                println("Medicine updated: ${medicine.name} (${medicine.stock})")
             }
-            .addOnFailureListener { e -> println("Failed to update medicine: ${e.message}") }
+            .addOnFailureListener { e ->
+                println("Failed to update medicine: ${e.message}")
+            }
     }
 
+    /**
+     * Supprime un médicament.
+     */
     fun deleteMedicine(medicineId: String) {
         firestore.collection(MEDICINES_COLLECTION)
             .document(medicineId)
             .delete()
-            .addOnSuccessListener { println("Medicine deleted: $medicineId") }
-            .addOnFailureListener { e -> println("Failed to delete medicine: ${e.message}") }
+            .addOnSuccessListener {
+                println("Medicine deleted: $medicineId")
+            }
+            .addOnFailureListener { e ->
+                println("Failed to delete medicine: ${e.message}")
+            }
     }
 
+    /**
+     * Filtre les médicaments par nom (préfixe)
+     */
     fun filterByName(name: String) {
         if (name.isEmpty()) {
-            loadMedicines()
+            observeMedicines()
         } else {
-            listenerRegistration?.remove()
-            listenerRegistration = firestore.collection(MEDICINES_COLLECTION)
-                .whereGreaterThanOrEqualTo("name", name)
-                .whereLessThanOrEqualTo("name", name + "\uf8ff")
-                .addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        return@addSnapshotListener
-                    }
-                    val medList = snapshot?.documents?.mapNotNull { it.toObject(Medicine::class.java) } ?: emptyList()
-                    _medicines.value = medList
-                }
+            val query = firestore.collection(MEDICINES_COLLECTION)
+                .orderBy("name")
+                .startAt(name)
+                .endAt(name + "\uf8ff")
+
+            observeMedicines(query)
         }
     }
 
+    /**
+     * Trie par nom (A → Z)
+     */
     fun sortByName() {
-        listenerRegistration?.remove()
-        listenerRegistration = firestore.collection(MEDICINES_COLLECTION)
+        val query = firestore.collection(MEDICINES_COLLECTION)
             .orderBy("name", Query.Direction.ASCENDING)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    println("Firestore sort error: ${e.message}")
-                    return@addSnapshotListener
-                }
-                val medList = snapshot?.documents?.mapNotNull { it.toObject(Medicine::class.java) } ?: emptyList()
-                _medicines.value = medList
-            }
+        observeMedicines(query)
     }
 
+    /**
+     * Trie par stock (croissant)
+     */
     fun sortByStock() {
-        listenerRegistration?.remove()
-        listenerRegistration = firestore.collection(MEDICINES_COLLECTION)
+        val query = firestore.collection(MEDICINES_COLLECTION)
             .orderBy("stock", Query.Direction.ASCENDING)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    return@addSnapshotListener
-                }
-                val medList = snapshot?.documents?.mapNotNull { it.toObject(Medicine::class.java) } ?: emptyList()
-                _medicines.value = medList
-            }
+        observeMedicines(query)
     }
 
-    fun sortByNone() {
-        loadMedicines()
+    /**
+     * Supprime tout tri ou filtre actif.
+     */
+    fun sortByNone() = observeMedicines()
+
+    /**
+     * Détache le listener Firestore pour éviter les fuites.
+     */
+    fun clearListener() {
+        listenerRegistration?.remove()
+        listenerRegistration = null
     }
 }

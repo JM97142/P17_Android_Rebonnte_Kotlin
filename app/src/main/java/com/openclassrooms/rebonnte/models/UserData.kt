@@ -1,9 +1,4 @@
-package com.openclassrooms.rebonnte.utils
-
-data class SignInResult(
-    val data: UserData?,
-    val errorMessage: String?
-)
+package com.openclassrooms.rebonnte.models
 
 data class UserData(
     val userId: String,

@@ -227,7 +227,8 @@ fun EmbeddedSearchBar(
                     onActiveChanged(!isSearchActive)
                 }
             )
-        },
+        }
+        ,
         trailingIcon = {
             if (isSearchActive && query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {

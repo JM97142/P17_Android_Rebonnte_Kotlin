@@ -18,9 +18,13 @@ class AisleRepository(private val firestore: FirebaseFirestore) {
         loadAisles()
     }
 
+    /**
+     * Attache (ou ré-attache) le listener Firestore pour la collection "aisles".
+     */
     fun loadAisles() {
+        // Retirer l'ancien listener si présent pour éviter duplication
         listenerRegistration?.remove()
-        println("Attaching new snapshot listener")
+
         listenerRegistration = firestore.collection(AISLES_COLLECTION)
             .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, e ->
@@ -35,29 +39,44 @@ class AisleRepository(private val firestore: FirebaseFirestore) {
                 val aisleList = snapshot.documents.mapNotNull { it.toObject(Aisle::class.java) }
                 println("Aisles updated: $aisleList")
                 _aisles.value = aisleList
+
+                // Si collection vide, ajouter un rayon par défaut
                 if (aisleList.isEmpty()) {
                     addAisle(Aisle("Aisle 1"))
                 }
             }
     }
 
+    /**
+     * Ajoute un aisle en Firestore.
+     */
     fun addAisle(aisle: Aisle) {
         firestore.collection(AISLES_COLLECTION).document(aisle.id).set(aisle)
             .addOnSuccessListener {
                 println("Aisle ${aisle.name} added successfully, ID: ${aisle.id}")
-                loadAisles() // Force refresh
+                // évite reload forcé si listener est correctement installé, mais tu peux le faire si nécessaire
+                // loadAisles()
             }
             .addOnFailureListener { e -> println("Failed to add aisle: $e") }
     }
 
-
-
+    /**
+     * Supprime un aisle en Firestore.
+     */
     fun deleteAisle(aisle: Aisle) {
         firestore.collection(AISLES_COLLECTION)
             .document(aisle.id)
             .delete()
-            .addOnSuccessListener { println("Medicine deleted: $aisles") }
-            .addOnFailureListener { e -> println("Failed to delete medicine: ${e.message}") }
+            .addOnSuccessListener { println("Aisle deleted: ${aisle.id}") }
+            .addOnFailureListener { e -> println("Failed to delete aisle: ${e.message}") }
     }
 
+    /**
+     * Détache le listener (évite fuites mémoire lors du clear du ViewModel / destroy).
+     */
+    fun clearListener() {
+        listenerRegistration?.remove()
+        listenerRegistration = null
+        println("AisleRepository: Firestore listener detached")
+    }
 }
