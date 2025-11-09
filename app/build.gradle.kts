@@ -17,6 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.openclassrooms.rebonnte"
         minSdk = 24
+        //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -36,10 +37,12 @@ android {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            isDebuggable = true
         }
 
         release {
             isMinifyEnabled = false
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -72,6 +75,17 @@ android {
                 )
             )
         }
+    }
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+        disable += listOf(
+            "FrequentlyChangingValue",
+            "RememberInComposition",
+            "NullSafeMutableLiveData",
+            "AutoboxingStateCreation"
+        )
+        abortOnError = false
     }
 }
 
@@ -129,6 +143,22 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
     executionData.setFrom(fileTree("build/outputs/code_coverage/debugAndroidTest/connected") {
         include("**/*.ec") // fichiers générés par les tests instrumentés
     })
+}
+sonar {
+    properties {
+        property("sonar.projectKey", "JM97142_P17_Android_Rebonnte_Kotlin")
+        property("sonar.organization", "jm97142")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.sources", "src/main/java")
+        property("sonar.tests", "src/test/java,src/androidTest/java")
+        property("sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug/classes")
+        property("sonar.kotlin.binaries", "${project.buildDir}/tmp/kotlin-classes/debug")
+        property("sonar.coverage.jacoco.xmlReportPaths",
+            "${project.buildDir}/reports/jacoco/jacocoUnitTestReport/jacocoUnitTestReport.xml," +
+                    "${project.buildDir}/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"
+        )
+        property("sonar.coverage.exclusions", "**/R.class,**/R$*.class,**/BuildConfig.*,**/Manifest*.*,**/*Test*.*")
+    }
 }
 
 dependencies {

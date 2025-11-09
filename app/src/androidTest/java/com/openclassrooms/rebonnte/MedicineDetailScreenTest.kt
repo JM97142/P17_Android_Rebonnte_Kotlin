@@ -95,4 +95,22 @@ class MedicineDetailScreenTest {
 
         composeTestRule.onNodeWithText("Loading medicine details...").assertIsDisplayed()
     }
+
+    @Test
+    fun clicking_plus_button_increases_stock_and_calls_updateMedicine() {
+        val slot = slot<com.openclassrooms.rebonnte.models.Medicine>()
+        every { viewModel.updateMedicine(capture(slot)) } just Runs
+
+        composeTestRule.setContent {
+            MedicineDetailScreen(name = "Aspirin", viewModel = viewModel) { backCalled = true }
+        }
+
+        // Clique sur le bouton "+"
+        composeTestRule.onNodeWithContentDescription("Plus One").performClick()
+
+        verify(exactly = 1) { viewModel.updateMedicine(any()) }
+
+        assert(slot.captured.stock == fakeMedicine.stock + 1)
+    }
+
 }

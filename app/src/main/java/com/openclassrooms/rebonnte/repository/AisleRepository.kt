@@ -53,9 +53,7 @@ class AisleRepository(private val firestore: FirebaseFirestore) {
     fun addAisle(aisle: Aisle) {
         firestore.collection(AISLES_COLLECTION).document(aisle.id).set(aisle)
             .addOnSuccessListener {
-                println("Aisle ${aisle.name} added successfully, ID: ${aisle.id}")
-                // évite reload forcé si listener est correctement installé, mais tu peux le faire si nécessaire
-                // loadAisles()
+                loadAisles()
             }
             .addOnFailureListener { e -> println("Failed to add aisle: $e") }
     }
