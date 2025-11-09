@@ -23,8 +23,8 @@ class AisleDetailScreenTest {
 
     private val fakeMedicines = listOf(
         Medicine(name = "Aspirin", stock = 10, nameAisle = "Aisle1"),
-        Medicine(name = "Paracetamol", stock = 5, nameAisle = "Aisle2"),
-        Medicine(name = "Ibuprofen", stock = 8, nameAisle = "Aisle3")
+        Medicine(name = "Paracetamol", stock = 5, nameAisle = "Aisle1"),
+        Medicine(name = "Ibuprofen", stock = 8, nameAisle = "Aisle2")
     )
     private val medicinesFlow = MutableStateFlow(fakeMedicines)
 
@@ -60,7 +60,7 @@ class AisleDetailScreenTest {
     @Test
     fun clicking_medicine_navigates_to_detail() {
         composeTestRule.setContent {
-            AisleDetailScreen(name = "Aisle2", viewModel = viewModel, navController = navController)
+            AisleDetailScreen(name = "Aisle1", viewModel = viewModel, navController = navController)
         }
 
         composeTestRule.onNodeWithText("Aspirin").performClick()

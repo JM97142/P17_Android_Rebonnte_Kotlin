@@ -108,7 +108,7 @@ fun EmailLogInButton(onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Sign in with Email",
+                    text = "Log in",
                     color = Color.White
                 )
             }

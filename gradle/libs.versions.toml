@@ -21,6 +21,7 @@ hilt = "2.49"
 ksp = "1.9.0-1.0.13"
 lifecycleRuntimeCompose = "2.7.0"
 lifecycleViewmodelSavedstateAndroid = "2.9.3"
+turbine = "1.1.0"
 uiTestJunit4Android = "1.9.2"
 hiltNavigationCompose = "1.2.0"
 materialIconsExtended = "1.6.0"
@@ -74,6 +75,7 @@ hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", ve
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 lifecycle-viewmodel-savedstate-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-savedstate-android", version.ref = "lifecycleViewmodelSavedstateAndroid" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 ui-test = { module = "androidx.compose.ui:ui-test" }
 ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }

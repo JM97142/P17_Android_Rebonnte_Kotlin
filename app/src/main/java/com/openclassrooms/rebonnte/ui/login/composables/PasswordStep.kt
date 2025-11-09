@@ -19,6 +19,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -44,19 +45,29 @@ fun PasswordStep(
         onValueChange = onPasswordChange,
         label = { Text("Password") },
         isError = passwordError != null,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("passwordTextField"),
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
             val description = if (passwordVisible) "Hide password" else "Show password"
-            IconButton(onClick = onPasswordVisibilityToggle) {
+            IconButton(
+                onClick = onPasswordVisibilityToggle,
+                modifier = Modifier.testTag("togglePasswordVisibility")
+            ) {
                 Icon(imageVector = image, contentDescription = description, tint = Color.Black)
             }
         }
     )
 
     passwordError?.let {
-        Text(text = it, color = Color.Red, fontSize = 12.sp)
+        Text(
+            text = it,
+            color = Color.Red,
+            fontSize = 12.sp,
+            modifier = Modifier.testTag("passwordErrorText")
+        )
     }
 
     Spacer(modifier = Modifier.height(32.dp))
@@ -66,7 +77,8 @@ fun PasswordStep(
         modifier = Modifier
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
-            .height(50.dp),
+            .height(50.dp)
+            .testTag("signInButton"),
         shape = RectangleShape,
     ) {
         Text(text = "Sign In", color = Color.Black)
@@ -74,7 +86,10 @@ fun PasswordStep(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    TextButton(onClick = onForgotPassword) {
+    TextButton(
+        onClick = onForgotPassword,
+        modifier = Modifier.testTag("forgotPasswordButton")
+    ) {
         Text("Trouble signing in?", color = Color.Black)
     }
 }

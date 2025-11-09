@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -106,7 +107,9 @@ fun PasswordField(
         onValueChange = onPasswordChange,
         label = { Text(text = stringResource(id = R.string.password), color = Color.Black) },
         isError = passwordError != null,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("PasswordField"),
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             PasswordVisibilityIcon(
@@ -178,7 +181,8 @@ fun LoginButton(
         modifier = Modifier
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
-            .height(50.dp),
+            .height(50.dp)
+            .testTag("PasswordLoginButton"),
         shape = RectangleShape
     ) {
         Text(text = stringResource(id = R.string.save))

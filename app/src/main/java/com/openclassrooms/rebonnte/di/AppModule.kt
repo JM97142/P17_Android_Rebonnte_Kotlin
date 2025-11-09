@@ -10,6 +10,7 @@ import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
 import com.openclassrooms.rebonnte.ui.login.LoginViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.signin.SignInViewModel
+import com.openclassrooms.rebonnte.ui.signup.SignUpViewModel
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
 import com.openclassrooms.rebonnte.utils.GoogleAuthClient
 import org.koin.android.ext.koin.androidContext
@@ -32,6 +33,7 @@ val appModule = module {
     viewModel { AisleViewModel(get()) }
     viewModel { MedicineViewModel(get()) }
     viewModel { SignInViewModel(get(), get()) }
+    viewModel { SignUpViewModel(get(), get()) }
 
     single { AisleRepository(get()) }
     single { MedicineRepository(get()) }

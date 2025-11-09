@@ -180,6 +180,7 @@ dependencies {
     testImplementation (libs.core.testing)
     testImplementation (libs.mockk)
     debugImplementation(libs.ui.test.manifest)
+    testImplementation(libs.turbine)
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)

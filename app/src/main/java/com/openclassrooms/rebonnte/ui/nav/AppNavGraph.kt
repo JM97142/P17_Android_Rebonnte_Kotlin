@@ -26,6 +26,7 @@ import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.signin.SignInScreen
 import com.openclassrooms.rebonnte.ui.signin.SignInViewModel
 import com.openclassrooms.rebonnte.ui.signup.SignUpScreen
+import com.openclassrooms.rebonnte.ui.signup.SignUpViewModel
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
 import com.openclassrooms.rebonnte.utils.GoogleAuthClient
 import kotlinx.coroutines.launch
@@ -82,17 +83,17 @@ fun AppNavGraph(
             }
         }
 
+        composable("login") {
+            LogInScreen(
+                navController = navController,
+                viewModel = loginViewModel)
+        }
+
         composable("email_sign_in") {
             EmailScreen(
                 onLogInClick = { navController.navigate("login") },
                 onSignUpClick = { navController.navigate("signup") },
                 navController = navController)
-        }
-
-        composable("login") {
-            LogInScreen(
-                navController = navController,
-                viewModel = loginViewModel)
         }
 
         composable("password_recovery") { RecoveryScreen(navController) }
@@ -102,6 +103,7 @@ fun AppNavGraph(
             navController = navController
         ) }
 
+        // Aisle & Medicine Screen
         composable("aisle") { AisleScreen(navController, aisleViewModel) }
         composable("aisle_detail/{aisleName}", arguments = listOf(navArgument("aisleName") { type = NavType.StringType })) { backStackEntry ->
             val aisleName = backStackEntry.arguments?.getString("aisleName") ?: "Unknown"

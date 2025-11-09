@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -52,7 +53,9 @@ fun EmailInput(
             onValueChange = onEmailChange,
             label = { Text(text = stringResource(id = R.string.email), color = Color.Black) },
             isError = emailError != null,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("EmailField"),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Gray,
@@ -86,7 +89,8 @@ fun EmailInput(
             modifier = Modifier
                 .padding(16.dp, bottom = 16.dp)
                 .width(150.dp)
-                .height(50.dp),
+                .height(50.dp)
+                .testTag("EmailNextButton"),
             shape = RectangleShape,
 
             ) {

@@ -13,6 +13,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -28,10 +29,17 @@ fun EmailStep(
         onValueChange = onEmailChange,
         label = { Text("Email Address") },
         isError = emailError != null,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("emailTextField")
     )
     emailError?.let {
-        Text(text = it, color = Color.Red, fontSize = 12.sp)
+        Text(
+            text = it,
+            color = Color.Red,
+            fontSize = 12.sp,
+            modifier = Modifier.testTag("emailErrorText")
+        )
     }
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -41,7 +49,8 @@ fun EmailStep(
         modifier = Modifier
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
-            .height(50.dp),
+            .height(50.dp)
+            .testTag("nextButton"),
         shape = RectangleShape,
     ) {
         Text("Next", color = Color.White)

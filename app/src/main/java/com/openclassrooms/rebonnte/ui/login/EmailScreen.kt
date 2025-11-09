@@ -82,7 +82,7 @@ fun EmailScreen(
                     shape = RectangleShape,
                 ) {
                     Text(
-                        text = "Log in",
+                        text = "Sign in with email address",
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = 16.sp
                     )
