@@ -58,8 +58,8 @@ fun BottomNavBar(
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Sign Out") },
-            label = { Text("Sign Out") },
+            icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Log Out Icon") },
+            label = { Text("Log Out") },
             selected = false,
             onClick = { showSignOutDialog = true }
         )
@@ -68,7 +68,7 @@ fun BottomNavBar(
     if (showSignOutDialog) {
         AlertDialog(
             onDismissRequest = { showSignOutDialog = false },
-            title = { Text("Sign Out") },
+            title = { Text("Sign out") },
             text = { Text("Are you sure you want to sign out?") },
             confirmButton = {
                 TextButton(onClick = {

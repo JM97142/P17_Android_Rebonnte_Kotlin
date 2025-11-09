@@ -54,7 +54,7 @@ class AisleViewModel(
         super.onCleared()
         viewModelScope.launch {
             repository.clearListener()
-            println("🧹 Aisle listener detached (ViewModel cleared)")
+            println("Aisle listener detached (ViewModel cleared)")
         }
     }
 }
