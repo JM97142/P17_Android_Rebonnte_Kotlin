@@ -74,7 +74,7 @@ class MedicineDetailScreenTest {
             MedicineDetailScreen(name = "Aspirin", viewModel = viewModel) { backCalled = true }
         }
 
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.onNodeWithContentDescription("Retour à la liste des médicaments").performClick()
         assert(backCalled)
     }
 
@@ -106,11 +106,10 @@ class MedicineDetailScreenTest {
         }
 
         // Clique sur le bouton "+"
-        composeTestRule.onNodeWithContentDescription("Plus One").performClick()
+        composeTestRule.onNodeWithContentDescription("Augmenter le stock de 1").performClick()
 
         verify(exactly = 1) { viewModel.updateMedicine(any()) }
 
         assert(slot.captured.stock == fakeMedicine.stock + 1)
     }
-
 }

@@ -96,7 +96,7 @@ class AddNewMedicineScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithContentDescription("Back").performClick()
+        composeTestRule.onNodeWithContentDescription("Retour").performClick()
 
         verify { navController.popBackStack() }
     }

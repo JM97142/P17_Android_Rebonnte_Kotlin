@@ -53,7 +53,8 @@ fun AddNewMedicineScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = { navController.popBackStack() },
-                        modifier = Modifier.semantics { contentDescription = "Retour" }
+                        modifier = Modifier
+                            .semantics { contentDescription = "Retour" }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

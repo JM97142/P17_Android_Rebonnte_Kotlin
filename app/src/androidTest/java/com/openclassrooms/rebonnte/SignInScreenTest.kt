@@ -16,7 +16,6 @@ class SignInScreenTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    // ---- TEST 1 ----
     @Test
     fun displays_app_name_and_login_button() {
         composeTestRule.setContent {
@@ -34,7 +33,6 @@ class SignInScreenTest {
         composeTestRule.onNodeWithText("Log in").assertIsDisplayed()
     }
 
-    // ---- TEST 2 ----
     @Test
     fun clicking_login_button_triggers_callback() {
         var emailClickCalled = false

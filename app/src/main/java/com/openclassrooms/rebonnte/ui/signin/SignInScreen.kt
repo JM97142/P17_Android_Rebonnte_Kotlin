@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
@@ -60,9 +61,9 @@ fun SignInScreen(
             text = stringResource(id = R.string.app_name),
             color = Color.Black,
             fontSize = 20.sp,
-            modifier = Modifier.semantics {
-                heading()
-            }
+            modifier = Modifier
+                .testTag("Rebonnte")
+                .semantics { heading() }
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -124,7 +125,7 @@ fun EmailLogInButton(onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Connexion par e-mail",
+                    text = "Log in",
                     color = Color.White
                 )
             }
