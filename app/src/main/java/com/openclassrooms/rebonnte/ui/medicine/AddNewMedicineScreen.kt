@@ -154,7 +154,7 @@ fun AddNewMedicineScreen(
                 }
             }
 
-            // Add Button
+            // Add Button + loading indicator
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd

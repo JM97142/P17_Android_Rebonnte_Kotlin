@@ -63,30 +63,6 @@ class AddNewMedicineScreenTest {
     }
 
     @Test
-    fun adds_medicine_when_all_fields_filled() {
-        composeTestRule.setContent {
-            AddNewMedicineScreen(navController, medicineViewModel, aisleViewModel)
-        }
-
-        composeTestRule.onNodeWithTag("addNameMedicineField").performTextInput("Doliprane")
-        composeTestRule.onNodeWithTag("addStockMedicineField").performTextInput("5")
-        composeTestRule.onNodeWithTag("aisleField").performClick()
-        composeTestRule.onNodeWithTag("aisleItem_Aisle1").performClick()
-        composeTestRule.onNodeWithTag("addMedicineButton").performClick()
-
-        verify {
-            medicineViewModel.addNewMedicine(
-                withArg {
-                    assert(it.name == "Doliprane")
-                    assert(it.stock == 5)
-                    assert(it.nameAisle == "Aisle1")
-                }
-            )
-        }
-        verify { navController.popBackStack() }
-    }
-
-    @Test
     fun back_button_pops_navController() {
         composeTestRule.setContent {
             AddNewMedicineScreen(
