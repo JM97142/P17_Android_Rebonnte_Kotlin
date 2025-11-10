@@ -63,20 +63,23 @@ fun PasswordInput(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        HeaderText()
+        Text(
+            text = stringResource(id = R.string.enter_password),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.semantics { heading() }
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
-        PasswordField(
+        LabeledPasswordField(
             password = password,
             onPasswordChange = onPasswordChange,
             passwordVisible = passwordVisible,
             onVisibilityToggle = { passwordVisible = !passwordVisible },
             passwordError = passwordError.value
         )
-
-        if (passwordError.value != null) {
-            ErrorText(errorMessage = passwordError.value)
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -89,20 +92,9 @@ fun PasswordInput(
     }
 }
 
-@Composable
-fun HeaderText() {
-    Text(
-        text = stringResource(id = R.string.enter_password),
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onBackground,
-        modifier = Modifier.semantics { heading() }
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordField(
+fun LabeledPasswordField(
     password: String,
     onPasswordChange: (String) -> Unit,
     passwordVisible: Boolean,
@@ -113,11 +105,6 @@ fun PasswordField(
         value = password,
         onValueChange = onPasswordChange,
         label = { Text(text = stringResource(id = R.string.password)) },
-        keyboardOptions = KeyboardOptions(
-            autoCorrectEnabled = false,
-            keyboardType = KeyboardType.Password,
-            imeAction = ImeAction.Done
-        ),
         isError = passwordError != null,
         modifier = Modifier
             .fillMaxWidth()
@@ -125,11 +112,24 @@ fun PasswordField(
             .semantics { contentDescription = "Champ mot de passe" },
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
-            PasswordVisibilityIcon(
-                passwordVisible = passwordVisible,
-                onVisibilityToggle = onVisibilityToggle
-            )
+            IconButton(
+                onClick = onVisibilityToggle,
+                modifier = Modifier.semantics {
+                    contentDescription = if (passwordVisible) "Masquer le mot de passe" else "Afficher le mot de passe"
+                }
+            ) {
+                Icon(
+                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         },
+        keyboardOptions = KeyboardOptions(
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedTextColor = MaterialTheme.colorScheme.onBackground,
             unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
@@ -142,30 +142,14 @@ fun PasswordField(
             containerColor = MaterialTheme.colorScheme.surface
         )
     )
-}
 
-@Composable
-fun PasswordVisibilityIcon(
-    passwordVisible: Boolean,
-    onVisibilityToggle: () -> Unit
-) {
-    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-    val description = if (passwordVisible) "Masquer le mot de passe" else "Afficher le mot de passe"
-    IconButton(
-        onClick = onVisibilityToggle,
-        modifier = Modifier.semantics { contentDescription = description }
-    ) {
-        Icon(imageVector = image, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+    if (passwordError != null) {
+        Text(
+            text = passwordError,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall
+        )
     }
-}
-
-@Composable
-fun ErrorText(errorMessage: String?) {
-    Text(
-        text = errorMessage ?: "",
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodySmall
-    )
 }
 
 @Composable
@@ -177,7 +161,7 @@ fun LoginButton(
 ) {
     Button(
         onClick = {
-            validatePassword(password, passwordError)
+            passwordError.value = validatePassword(password)
             if (passwordError.value == null) {
                 Toast.makeText(context, "Proceeding with login", Toast.LENGTH_SHORT).show()
                 onLogin()
@@ -197,8 +181,8 @@ fun LoginButton(
     }
 }
 
-private fun validatePassword(password: String, passwordError: MutableState<String?>) {
-    passwordError.value = when {
+private fun validatePassword(password: String): String? {
+    return when {
         password.isBlank() -> "Password cannot be empty"
         password.length < 6 -> "Password must be at least 6 characters"
         else -> null

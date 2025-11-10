@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.openclassrooms.rebonnte.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NameLastnameInput(
     name: String,
@@ -61,83 +60,33 @@ fun NameLastnameInput(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Name Input
-        OutlinedTextField(
+        LabeledTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text(text = stringResource(id = R.string.name)) },
-            isError = nameError != null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("NameField")
-                .semantics { contentDescription = "Champ nom" },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                errorTextColor = MaterialTheme.colorScheme.error,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                errorBorderColor = MaterialTheme.colorScheme.error,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            label = stringResource(id = R.string.name),
+            error = nameError,
+            testTag = "NameField",
+            contentDescription = "Champ nom"
         )
-        nameError?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .align(Alignment.Start)
-            )
-        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Lastname Input
-        OutlinedTextField(
+        LabeledTextField(
             value = lastname,
             onValueChange = onLastnameChange,
-            label = { Text(text = stringResource(id = R.string.lastname)) },
-            isError = lastnameError != null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("LastNameField")
-                .semantics { contentDescription = "Champ prénom" },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                errorTextColor = MaterialTheme.colorScheme.error,
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                errorBorderColor = MaterialTheme.colorScheme.error,
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+            label = stringResource(id = R.string.lastname),
+            error = lastnameError,
+            testTag = "LastNameField",
+            contentDescription = "Champ prénom"
         )
-        lastnameError?.let {
-            Text(
-                text = it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .align(Alignment.Start)
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Next Button
         Button(
             onClick = {
                 nameError = if (name.isBlank()) "Name cannot be empty" else null
                 lastnameError = if (lastname.isBlank()) "Surname cannot be empty" else null
-
-                if (nameError == null && lastnameError == null) {
-                    onNext()
-                }
+                if (nameError == null && lastnameError == null) onNext()
             },
             modifier = Modifier
                 .padding(16.dp, bottom = 16.dp)
@@ -145,11 +94,54 @@ fun NameLastnameInput(
                 .height(50.dp)
                 .testTag("NameNextButton")
                 .semantics { contentDescription = "Bouton suivant" },
-            shape = RectangleShape,
+            shape = RectangleShape
         ) {
             Text(
                 text = stringResource(id = R.string.next),
                 color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LabeledTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    error: String? = null,
+    testTag: String,
+    contentDescription: String
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            isError = error != null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(testTag)
+                .semantics { this.contentDescription = contentDescription },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                errorTextColor = MaterialTheme.colorScheme.error,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        )
+        error?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.align(Alignment.Start)
             )
         }
     }
