@@ -18,15 +18,15 @@ import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
 import com.openclassrooms.rebonnte.ui.login.EmailScreen
 import com.openclassrooms.rebonnte.ui.login.LogInScreen
 import com.openclassrooms.rebonnte.ui.login.LoginViewModel
-import com.openclassrooms.rebonnte.ui.login.RecoveryScreen
+import com.openclassrooms.rebonnte.ui.recovery.RecoveryScreen
 import com.openclassrooms.rebonnte.ui.medicine.AddNewMedicineScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineDetailScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineScreen
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
+import com.openclassrooms.rebonnte.ui.recovery.RecoveryViewModel
 import com.openclassrooms.rebonnte.ui.signin.SignInScreen
 import com.openclassrooms.rebonnte.ui.signin.SignInViewModel
 import com.openclassrooms.rebonnte.ui.signup.SignUpScreen
-import com.openclassrooms.rebonnte.ui.signup.SignUpViewModel
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
 import com.openclassrooms.rebonnte.utils.GoogleAuthClient
 import kotlinx.coroutines.launch
@@ -36,6 +36,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AppNavGraph(
     navController: NavHostController,
     loginViewModel: LoginViewModel,
+    recoveryViewModel: RecoveryViewModel,
     aisleViewModel: AisleViewModel,
     medicineViewModel: MedicineViewModel,
     googleAuthClient: GoogleAuthClient,

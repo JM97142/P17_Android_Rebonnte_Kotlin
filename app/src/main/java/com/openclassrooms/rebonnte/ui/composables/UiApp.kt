@@ -18,6 +18,7 @@ import com.openclassrooms.rebonnte.ui.login.LoginViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
 import com.openclassrooms.rebonnte.ui.nav.AppNavGraph
 import com.openclassrooms.rebonnte.ui.nav.BottomNavBar
+import com.openclassrooms.rebonnte.ui.recovery.RecoveryViewModel
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
 import com.openclassrooms.rebonnte.utils.GoogleAuthClient
 
@@ -28,6 +29,7 @@ fun UiApp(
     emailAuthClient: EmailAuthClient,
     lifecycleScope: LifecycleCoroutineScope,
     loginViewModel: LoginViewModel,
+    recoveryViewModel: RecoveryViewModel,
     aisleViewModel: AisleViewModel,
     medicineViewModel: MedicineViewModel
 ) {
@@ -99,6 +101,7 @@ fun UiApp(
         AppNavGraph(
             navController = navController,
             loginViewModel = loginViewModel,
+            recoveryViewModel = recoveryViewModel,
             aisleViewModel = aisleViewModel,
             medicineViewModel = medicineViewModel,
             googleAuthClient = googleAuthUiClient,

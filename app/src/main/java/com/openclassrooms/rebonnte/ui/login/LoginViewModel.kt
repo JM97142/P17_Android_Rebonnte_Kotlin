@@ -8,6 +8,7 @@ import com.openclassrooms.rebonnte.utils.UiEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class LoginViewModel(
     private val auth: FirebaseAuth
@@ -51,14 +52,16 @@ class LoginViewModel(
         }
 
         viewModelScope.launch {
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        _uiEvent.value = UiEvent.Navigate("aisle")
-                    } else {
-                        _uiEvent.value = UiEvent.ShowMessage("Authentication failed")
-                    }
-                }
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            try {
+                auth.signInWithEmailAndPassword(email, password).await()
+                _uiEvent.value = UiEvent.Navigate("aisle")
+            } catch (e: Exception) {
+                _uiEvent.value = UiEvent.ShowMessage("Authentication failed: ${e.message}")
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
         }
     }
 

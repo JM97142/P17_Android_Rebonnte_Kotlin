@@ -9,6 +9,7 @@ import com.openclassrooms.rebonnte.repository.MedicineRepository
 import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
 import com.openclassrooms.rebonnte.ui.login.LoginViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
+import com.openclassrooms.rebonnte.ui.recovery.RecoveryViewModel
 import com.openclassrooms.rebonnte.ui.signin.SignInViewModel
 import com.openclassrooms.rebonnte.ui.signup.SignUpViewModel
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
@@ -30,6 +31,7 @@ val appModule = module {
     single { EmailAuthClient() }
 
     viewModel { LoginViewModel(get()) }
+    viewModel { RecoveryViewModel(get()) }
     viewModel { AisleViewModel(get()) }
     viewModel { MedicineViewModel(get()) }
     viewModel { SignInViewModel(get(), get()) }

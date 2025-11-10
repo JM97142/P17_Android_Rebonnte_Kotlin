@@ -34,6 +34,7 @@ fun AddNewMedicineScreen(
     var stock by remember { mutableStateOf("") }
     var selectedAisle by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -154,31 +155,53 @@ fun AddNewMedicineScreen(
             }
 
             // Add Button
-            Button(
-                onClick = {
-                    if (name.isBlank() || stock.isBlank() || selectedAisle.isBlank()) {
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Please fill all fields")
-                        }
-                    } else {
-                        val newMedicine = Medicine(
-                            name = name,
-                            stock = stock.toInt(),
-                            nameAisle = selectedAisle
-                        )
-                        medicineViewModel.addNewMedicine(newMedicine)
-                        coroutineScope.launch {
-                            snackbarHostState.showSnackbar("Medicine added")
-                        }
-                        navController.popBackStack()
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .testTag("addMedicineButton")
-                    .semantics { contentDescription = "Bouton pour ajouter le médicament" }
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
             ) {
-                Text("Add Medicine")
+                Button(
+                    onClick = {
+                        if (name.isBlank() || stock.isBlank() || selectedAisle.isBlank()) {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("Please fill all fields")
+                            }
+                        } else {
+                            val newMedicine = Medicine(
+                                name = name,
+                                stock = stock.toInt(),
+                                nameAisle = selectedAisle
+                            )
+
+                            coroutineScope.launch {
+                                isLoading = true
+                                try {
+                                    medicineViewModel.addNewMedicine(newMedicine)
+                                    snackbarHostState.showSnackbar("Medicine added")
+                                    navController.popBackStack()
+                                } finally {
+                                    isLoading = false
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .testTag("addMedicineButton")
+                        .semantics { contentDescription = "Bouton pour ajouter le médicament" },
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text("Adding...", color = MaterialTheme.colorScheme.onPrimary)
+                    } else {
+                        Text("Add Medicine")
+                    }
+                }
             }
         }
     }

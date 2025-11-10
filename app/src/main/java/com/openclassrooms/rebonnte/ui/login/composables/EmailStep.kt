@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -29,13 +27,14 @@ fun EmailStep(
     onEmailChange: (String) -> Unit,
     onNext: () -> Unit
 ) {
-    TextField(
+    OutlinedTextField(
         value = email,
         onValueChange = onEmailChange,
         label = { Text("Email Address") },
         isError = emailError != null,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(16.dp)
             .testTag("emailTextField")
             .semantics {
                 contentDescription = "Champ pour saisir l’adresse e-mail"

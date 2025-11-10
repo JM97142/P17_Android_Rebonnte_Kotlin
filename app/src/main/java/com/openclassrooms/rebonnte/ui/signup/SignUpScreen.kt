@@ -62,7 +62,7 @@ fun SignUpScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.Top,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DisplayAppIcon()

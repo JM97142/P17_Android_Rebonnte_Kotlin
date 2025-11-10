@@ -79,7 +79,8 @@ fun LogInScreen(
                     onPasswordChange = viewModel::onPasswordChange,
                     onPasswordVisibilityToggle = viewModel::togglePasswordVisibility,
                     onSignIn = viewModel::onSignIn,
-                    onForgotPassword = { navController.navigate("password_recovery") }
+                    onForgotPassword = { navController.navigate("password_recovery") },
+                    isLoading = uiState.isLoading
                 )
             }
         }

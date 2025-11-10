@@ -9,6 +9,7 @@ import com.openclassrooms.rebonnte.ui.aisle.AisleViewModel
 import com.openclassrooms.rebonnte.ui.composables.UiApp
 import com.openclassrooms.rebonnte.ui.login.LoginViewModel
 import com.openclassrooms.rebonnte.ui.medicine.MedicineViewModel
+import com.openclassrooms.rebonnte.ui.recovery.RecoveryViewModel
 import com.openclassrooms.rebonnte.ui.theme.RebonnteTheme
 import com.openclassrooms.rebonnte.utils.EmailAuthClient
 import com.openclassrooms.rebonnte.utils.GoogleAuthClient
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
         val loginViewModel: LoginViewModel = get()
         val aisleViewModel: AisleViewModel = get()
         val medicineViewModel: MedicineViewModel = get()
+        val recoveryViewModel: RecoveryViewModel = get()
 
         setContent {
             RebonnteTheme {
@@ -39,6 +41,7 @@ class MainActivity : ComponentActivity() {
                     emailAuthClient = emailAuthClient,
                     lifecycleScope = lifecycleScope,
                     loginViewModel = loginViewModel,
+                    recoveryViewModel = recoveryViewModel,
                     aisleViewModel = aisleViewModel,
                     medicineViewModel = medicineViewModel
                 )
