@@ -8,6 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Repository responsable de la gestion des médicaments (Medicines).
+ * Observe Firestore en temps réel.
+ * Permet le tri distant (Firestore).
+ */
 class MedicineRepository(
     private val firestore: FirebaseFirestore
 ) {
@@ -17,8 +22,11 @@ class MedicineRepository(
 
     private var listenerRegistration: ListenerRegistration? = null
 
+    // Flux exposé vers l’UI
     private val _medicines = MutableStateFlow<List<Medicine>>(emptyList())
     val medicines: StateFlow<List<Medicine>> = _medicines.asStateFlow()
+
+    private var allMedicines: List<Medicine> = emptyList()
 
     init {
         observeMedicines()
@@ -26,11 +34,12 @@ class MedicineRepository(
 
     /**
      * Observe toutes les modifications Firestore en temps réel.
+     * Peut être rappelée avec une requête triée.
      */
     private fun observeMedicines(
         query: Query = firestore.collection(MEDICINES_COLLECTION)
     ) {
-        // Évite les doublons de listeners
+        // Retire tout listener précédent (évite doublons)
         listenerRegistration?.remove()
 
         listenerRegistration = query.addSnapshotListener { snapshot, error ->
@@ -42,8 +51,8 @@ class MedicineRepository(
                     val medList = snapshot.documents.mapNotNull { doc ->
                         doc.toObject(Medicine::class.java)?.copy(id = doc.id)
                     }
+                    allMedicines = medList
                     _medicines.value = medList
-                    println("Medicines updated: ${medList.size} items")
                 }
                 else -> println("Snapshot null without error.")
             }
@@ -57,7 +66,7 @@ class MedicineRepository(
         val docRef = firestore.collection(MEDICINES_COLLECTION).document()
         val medicineWithId = medicine.copy(id = docRef.id)
 
-        // Ajout dans le StateFlow pour réactivité UI
+        // Ajout optimiste local
         _medicines.value = _medicines.value + medicineWithId
 
         // Envoi vers Firestore
@@ -67,7 +76,6 @@ class MedicineRepository(
             }
             .addOnFailureListener { e ->
                 println("Failed to add medicine: ${e.message}")
-                // En cas d'échec Firestore, on retire l'élément ajouté localement
                 _medicines.value = _medicines.value.filterNot { it.id == medicineWithId.id }
             }
     }
@@ -93,7 +101,7 @@ class MedicineRepository(
     }
 
     /**
-     * Supprime un médicament.
+     * Supprime un médicament à partir de son ID.
      */
     fun deleteMedicine(medicineId: String) {
         firestore.collection(MEDICINES_COLLECTION)
@@ -108,23 +116,20 @@ class MedicineRepository(
     }
 
     /**
-     * Filtre les médicaments par nom (préfixe)
+     * Filtre les médicaments par nom.
      */
     fun filterByName(name: String) {
-        if (name.isEmpty()) {
-            observeMedicines()
+        _medicines.value = if (name.isBlank()) {
+            allMedicines
         } else {
-            val query = firestore.collection(MEDICINES_COLLECTION)
-                .orderBy("name")
-                .startAt(name)
-                .endAt(name + "\uf8ff")
-
-            observeMedicines(query)
+            allMedicines.filter {
+                it.name.contains(name, ignoreCase = true)
+            }
         }
     }
 
     /**
-     * Trie par nom (A → Z)
+     * Trie par nom (ordre alphabétique croissant) via Firestore.
      */
     fun sortByName() {
         val query = firestore.collection(MEDICINES_COLLECTION)
@@ -133,7 +138,7 @@ class MedicineRepository(
     }
 
     /**
-     * Trie par stock (croissant)
+     * Trie par stock (ordre croissant) via Firestore.
      */
     fun sortByStock() {
         val query = firestore.collection(MEDICINES_COLLECTION)
@@ -142,12 +147,14 @@ class MedicineRepository(
     }
 
     /**
-     * Supprime tout tri ou filtre actif.
+     * Supprime tout tri ou filtre actif et recharge la liste complète.
      */
-    fun sortByNone() = observeMedicines()
+    fun sortByNone() {
+        observeMedicines()
+    }
 
     /**
-     * Détache le listener Firestore pour éviter les fuites.
+     * Détache le listener Firestore (appelé lors du onCleared() du ViewModel).
      */
     fun clearListener() {
         listenerRegistration?.remove()

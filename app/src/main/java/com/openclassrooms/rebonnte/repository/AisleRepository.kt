@@ -8,10 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Repository responsable de la gestion des rayons (Aisles) dans Firestore.
+ * Fournit un flux (StateFlow) réactif de la liste des rayons,
+ * et maintient un listener Firestore en temps réel.
+ */
 class AisleRepository(private val firestore: FirebaseFirestore) {
+
     private val _aisles = MutableStateFlow<List<Aisle>>(emptyList())
     val aisles: StateFlow<List<Aisle>> = _aisles.asStateFlow()
+
     private val AISLES_COLLECTION = "aisles"
+
     private var listenerRegistration: ListenerRegistration? = null
 
     init {
@@ -20,9 +28,11 @@ class AisleRepository(private val firestore: FirebaseFirestore) {
 
     /**
      * Attache (ou ré-attache) le listener Firestore pour la collection "aisles".
+     * Écoute en temps réel toutes les modifications.
+     *
+     * Si la collection est vide au premier lancement, crée et affiche un rayon par défaut.
      */
     fun loadAisles() {
-        // Retirer l'ancien listener si présent pour éviter duplication
         listenerRegistration?.remove()
 
         listenerRegistration = firestore.collection(AISLES_COLLECTION)
@@ -32,45 +42,58 @@ class AisleRepository(private val firestore: FirebaseFirestore) {
                     println("Snapshot listener error: $e")
                     return@addSnapshotListener
                 }
-                if (snapshot == null) {
-                    println("Snapshot is null")
-                    return@addSnapshotListener
-                }
-                val aisleList = snapshot.documents.mapNotNull { it.toObject(Aisle::class.java) }
-                println("Aisles updated: $aisleList")
+
+                val aisleList = snapshot?.documents?.mapNotNull {
+                    it.toObject(Aisle::class.java)
+                } ?: emptyList()
+
                 _aisles.value = aisleList
 
-                // Si collection vide, ajouter un rayon par défaut
                 if (aisleList.isEmpty()) {
-                    addAisle(Aisle("Aisle 1"))
+                    val defaultAisle = Aisle("Aisle 1")
+
+                    _aisles.value = listOf(defaultAisle)
+
+                    addAisle(defaultAisle)
                 }
             }
     }
 
     /**
-     * Ajoute un aisle en Firestore.
+     * Ajoute un rayon (Aisle) dans Firestore.
+     * Si l’ajout réussit, Firestore déclenchera automatiquement une mise à jour via le listener.
      */
     fun addAisle(aisle: Aisle) {
-        firestore.collection(AISLES_COLLECTION).document(aisle.id).set(aisle)
+        firestore.collection(AISLES_COLLECTION)
+            .document(aisle.id)
+            .set(aisle)
             .addOnSuccessListener {
-                loadAisles()
+                println("Aisle added successfully: ${aisle.name}")
             }
-            .addOnFailureListener { e -> println("Failed to add aisle: $e") }
+            .addOnFailureListener { e ->
+                println("Failed to add aisle: $e")
+            }
     }
 
     /**
-     * Supprime un aisle en Firestore.
+     * Supprime un rayon existant dans Firestore.
+     * La suppression est automatiquement répercutée sur l’UI via le listener.
      */
     fun deleteAisle(aisle: Aisle) {
         firestore.collection(AISLES_COLLECTION)
             .document(aisle.id)
             .delete()
-            .addOnSuccessListener { println("Aisle deleted: ${aisle.id}") }
-            .addOnFailureListener { e -> println("Failed to delete aisle: ${e.message}") }
+            .addOnSuccessListener {
+                println("Aisle deleted: ${aisle.id}")
+            }
+            .addOnFailureListener { e ->
+                println("Failed to delete aisle: ${e.message}")
+            }
     }
 
     /**
-     * Détache le listener (évite fuites mémoire lors du clear du ViewModel / destroy).
+     * Détache proprement le listener Firestore.
+     * À appeler lors de la destruction du ViewModel pour éviter les fuites mémoire.
      */
     fun clearListener() {
         listenerRegistration?.remove()
