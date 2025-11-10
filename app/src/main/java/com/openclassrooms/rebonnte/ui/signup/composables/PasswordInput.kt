@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,12 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -93,10 +95,12 @@ fun HeaderText() {
         text = stringResource(id = R.string.enter_password),
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Color.Black
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = Modifier.semantics { heading() }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordField(
     password: String,
@@ -108,7 +112,7 @@ fun PasswordField(
     OutlinedTextField(
         value = password,
         onValueChange = onPasswordChange,
-        label = { Text(text = stringResource(id = R.string.password), color = Color.Black) },
+        label = { Text(text = stringResource(id = R.string.password)) },
         keyboardOptions = KeyboardOptions(
             autoCorrectEnabled = false,
             keyboardType = KeyboardType.Password,
@@ -117,7 +121,8 @@ fun PasswordField(
         isError = passwordError != null,
         modifier = Modifier
             .fillMaxWidth()
-            .testTag("PasswordField"),
+            .testTag("PasswordField")
+            .semantics { contentDescription = "Champ mot de passe" },
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
             PasswordVisibilityIcon(
@@ -125,20 +130,16 @@ fun PasswordField(
                 onVisibilityToggle = onVisibilityToggle
             )
         },
-        colors = TextFieldDefaults.colors(
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            disabledTextColor = Color.Gray,
-            errorTextColor = Color.Red,
-            focusedIndicatorColor = Color.Black,
-            unfocusedIndicatorColor = Color.Black,
-            errorIndicatorColor = Color.Black,
-            focusedLabelColor = Color.Black,
-            unfocusedLabelColor = Color.Black,
-            focusedContainerColor = colorResource(id = R.color.teal_700),
-            unfocusedContainerColor = colorResource(id = R.color.teal_700),
-            disabledContainerColor = Color.LightGray,
-            errorContainerColor = Color.Red
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            errorTextColor = MaterialTheme.colorScheme.error,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            errorBorderColor = MaterialTheme.colorScheme.error,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            containerColor = MaterialTheme.colorScheme.surface
         )
     )
 }
@@ -149,13 +150,12 @@ fun PasswordVisibilityIcon(
     onVisibilityToggle: () -> Unit
 ) {
     val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-    val description = if (passwordVisible) "Hide password" else "Show password"
-    IconButton(onClick = onVisibilityToggle) {
-        Icon(
-            imageVector = image,
-            contentDescription = description,
-            tint = Color.White
-        )
+    val description = if (passwordVisible) "Masquer le mot de passe" else "Afficher le mot de passe"
+    IconButton(
+        onClick = onVisibilityToggle,
+        modifier = Modifier.semantics { contentDescription = description }
+    ) {
+        Icon(imageVector = image, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
     }
 }
 
@@ -163,7 +163,7 @@ fun PasswordVisibilityIcon(
 fun ErrorText(errorMessage: String?) {
     Text(
         text = errorMessage ?: "",
-        color = Color.White,
+        color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodySmall
     )
 }
@@ -178,7 +178,6 @@ fun LoginButton(
     Button(
         onClick = {
             validatePassword(password, passwordError)
-
             if (passwordError.value == null) {
                 Toast.makeText(context, "Proceeding with login", Toast.LENGTH_SHORT).show()
                 onLogin()
@@ -190,10 +189,11 @@ fun LoginButton(
             .padding(16.dp, bottom = 16.dp)
             .width(150.dp)
             .height(50.dp)
-            .testTag("PasswordLoginButton"),
+            .testTag("PasswordLoginButton")
+            .semantics { contentDescription = "Bouton connexion" },
         shape = RectangleShape
     ) {
-        Text(text = stringResource(id = R.string.save))
+        Text(text = stringResource(id = R.string.save), color = MaterialTheme.colorScheme.onPrimary)
     }
 }
 

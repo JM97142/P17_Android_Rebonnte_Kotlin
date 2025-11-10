@@ -1,6 +1,7 @@
 package com.openclassrooms.rebonnte.ui.nav
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
@@ -58,7 +59,7 @@ fun BottomNavBar(
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.Default.ExitToApp, contentDescription = "Log Out Icon") },
+            icon = { Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Log Out Icon") },
             label = { Text("Log Out") },
             selected = false,
             onClick = { showSignOutDialog = true }
@@ -73,17 +74,25 @@ fun BottomNavBar(
             confirmButton = {
                 TextButton(onClick = {
                     coroutineScope.launch {
-                        googleAuthUiClient.signOut()
+
                         emailAuthClient.clearSession()
+
+                        val currentUser = emailAuthClient.getSignedInUser()
+                        if (currentUser != null) {
+                            println("Warning: user still signed in after signOut")
+                        }
+
                         signInViewModel.resetState()
                         aisleViewModel.reloadAisles()
                         medicineViewModel.reloadMedicines()
+
                         navController.navigate("sign_in") {
                             popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             launchSingleTop = true
                         }
                         onSignOut()
                     }
+
                     showSignOutDialog = false
                 }) {
                     Text("Yes")

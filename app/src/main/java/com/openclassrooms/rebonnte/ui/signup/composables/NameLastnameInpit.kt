@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -20,16 +21,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.openclassrooms.rebonnte.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NameLastnameInput(
     name: String,
@@ -52,7 +55,8 @@ fun NameLastnameInput(
             text = stringResource(id = R.string.enter_name_surname),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.semantics { heading() }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -61,66 +65,56 @@ fun NameLastnameInput(
         OutlinedTextField(
             value = name,
             onValueChange = onNameChange,
-            label = { Text(
-                text = stringResource(id = R.string.name),
-            ) },
+            label = { Text(text = stringResource(id = R.string.name)) },
             isError = nameError != null,
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("NameField"),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Gray,
-                disabledTextColor = Color.Gray,
-                errorTextColor = Color.Red,
-                focusedIndicatorColor = Color.Black,
-                unfocusedIndicatorColor = Color.Gray,
-                errorIndicatorColor = Color.Red,
-                focusedLabelColor = Color.Black,
-                unfocusedLabelColor = Color.Gray,
-                focusedContainerColor = colorResource(id = R.color.teal_700),
-                unfocusedContainerColor = colorResource(id = R.color.teal_700),
-                disabledContainerColor = Color.LightGray,
-                errorContainerColor = Color.White
+                .testTag("NameField")
+                .semantics { contentDescription = "Champ nom" },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                errorTextColor = MaterialTheme.colorScheme.error,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                containerColor = MaterialTheme.colorScheme.surface
             )
         )
         nameError?.let {
             Text(
                 text = it,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier
+                    .align(Alignment.Start)
             )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // lastname Input
+        // Lastname Input
         OutlinedTextField(
             value = lastname,
             onValueChange = onLastnameChange,
-            label = { Text(
-                text = stringResource(id = R.string.lastname),
-                color = Color.Black)
-            },
+            label = { Text(text = stringResource(id = R.string.lastname)) },
             isError = lastnameError != null,
             modifier = Modifier
                 .fillMaxWidth()
-                .testTag("LastNameField"),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                disabledTextColor = Color.Gray,
-                errorTextColor = Color.Red,
-                focusedIndicatorColor = Color.Black,
-                unfocusedIndicatorColor = Color.Black,
-                errorIndicatorColor = Color.Black,
-                focusedLabelColor = Color.Black,
-                unfocusedLabelColor = Color.Black,
-                focusedContainerColor = colorResource(id = R.color.teal_700),
-                unfocusedContainerColor = colorResource(id = R.color.teal_700),
-                disabledContainerColor = Color.LightGray,
-                errorContainerColor = Color.White
+                .testTag("LastNameField")
+                .semantics { contentDescription = "Champ prénom" },
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                errorTextColor = MaterialTheme.colorScheme.error,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                errorBorderColor = MaterialTheme.colorScheme.error,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                containerColor = MaterialTheme.colorScheme.surface
             )
         )
         lastnameError?.let {
@@ -128,23 +122,18 @@ fun NameLastnameInput(
                 text = it,
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier
+                    .align(Alignment.Start)
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Next Button to proceed to password screen
+        // Next Button
         Button(
             onClick = {
-                nameError = when {
-                    name.isBlank() -> "Name cannot be empty"
-                    else -> null
-                }
-                lastnameError = when {
-                    lastname.isBlank() -> "Surname cannot be empty"
-                    else -> null
-                }
+                nameError = if (name.isBlank()) "Name cannot be empty" else null
+                lastnameError = if (lastname.isBlank()) "Surname cannot be empty" else null
 
                 if (nameError == null && lastnameError == null) {
                     onNext()
@@ -154,10 +143,14 @@ fun NameLastnameInput(
                 .padding(16.dp, bottom = 16.dp)
                 .width(150.dp)
                 .height(50.dp)
-                .testTag("NameNextButton"),
+                .testTag("NameNextButton")
+                .semantics { contentDescription = "Bouton suivant" },
             shape = RectangleShape,
         ) {
-            Text(text = stringResource(id = R.string.next))
+            Text(
+                text = stringResource(id = R.string.next),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
         }
     }
 }

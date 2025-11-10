@@ -1,6 +1,7 @@
 package com.openclassrooms.rebonnte.ui.signin
 
 import android.content.Context
+import android.view.View
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -44,18 +49,24 @@ fun SignInScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(50.dp)
-            .verticalScroll(scrollState),
+            .verticalScroll(scrollState)
+            .semantics {
+                contentDescription = "Écran de connexion"
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = stringResource(id = R.string.app_name),
             color = Color.Black,
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            modifier = Modifier.semantics {
+                heading()
+            }
         )
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
-
+        // Bouton Email
         EmailLogInButton { onEmailSignInClick() }
     }
 }
@@ -67,6 +78,8 @@ fun GoogleLogInButton(onClick: () -> Unit) {
             SignInButton(context).apply {
                 setSize(SignInButton.SIZE_WIDE)
                 setOnClickListener { onClick() }
+                contentDescription = "Se connecter avec Google" // TalkBack
+                importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
             }
         },
         modifier = Modifier
@@ -82,7 +95,10 @@ fun EmailLogInButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .width(200.dp)
-            .height(50.dp),
+            .height(50.dp)
+            .semantics {
+                contentDescription = "Se connecter avec un e-mail"
+            },
         shape = RectangleShape,
         contentPadding = PaddingValues(0.dp)
     ) {
@@ -95,7 +111,7 @@ fun EmailLogInButton(onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Filled.Email,
-                contentDescription = "Email Icon",
+                contentDescription = "Icône de messagerie",
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
@@ -108,7 +124,7 @@ fun EmailLogInButton(onClick: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Log in",
+                    text = "Connexion par e-mail",
                     color = Color.White
                 )
             }

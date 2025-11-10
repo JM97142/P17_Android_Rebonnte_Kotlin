@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.*
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.openclassrooms.rebonnte.ui.login.composables.EmailStep
 import com.openclassrooms.rebonnte.ui.login.composables.LoginScreenLogo
@@ -41,24 +43,26 @@ fun LogInScreen(
             LoginTopAppBar(
                 currentStep = uiState.currentStep,
                 onBackClick = {
-                    if (uiState.currentStep > 1) {
-                        viewModel.onPreviousStep()
-                    } else {
-                        navController.navigate("email_sign_in")
-                    }
+                    if (uiState.currentStep > 1) viewModel.onPreviousStep()
+                    else navController.navigate("email_sign_in")
                 }
             )
         }
     ) { padding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .semantics { contentDescription = "Écran de connexion utilisateur" },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             LoginScreenLogo()
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             when (uiState.currentStep) {
                 1 -> EmailStep(

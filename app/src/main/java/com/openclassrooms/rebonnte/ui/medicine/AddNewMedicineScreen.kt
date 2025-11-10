@@ -9,6 +9,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -33,21 +38,39 @@ fun AddNewMedicineScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text("Add Medicine",
-                    modifier = Modifier.testTag("topBarTitle")
-                ) },
+            TopAppBar(
+                title = {
+                    Text(
+                        "Add Medicine",
+                        modifier = Modifier
+                            .testTag("topBarTitle")
+                            .semantics {
+                                heading()
+                                contentDescription = "Ajouter un nouveau médicament"
+                            }
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.semantics { contentDescription = "Retour" }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = null
                         )
                     }
                 }
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Assertive }
+                )
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -64,6 +87,7 @@ fun AddNewMedicineScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("addNameMedicineField")
+                    .semantics { contentDescription = "Champ pour le nom du médicament" }
             )
 
             // Stock
@@ -75,6 +99,7 @@ fun AddNewMedicineScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("addStockMedicineField")
+                    .semantics { contentDescription = "Champ pour le stock du médicament" }
             )
 
             // Aisle Picker
@@ -84,6 +109,7 @@ fun AddNewMedicineScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("aisleDropdown")
+                    .semantics { contentDescription = "Sélecteur d'allée" }
             ) {
                 TextField(
                     value = selectedAisle,
@@ -97,6 +123,7 @@ fun AddNewMedicineScreen(
                         .menuAnchor()
                         .fillMaxWidth()
                         .testTag("aisleField")
+                        .semantics { contentDescription = "Champ de sélection d'allée" }
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
@@ -105,7 +132,8 @@ fun AddNewMedicineScreen(
                     if (aisles.isEmpty()) {
                         DropdownMenuItem(
                             text = { Text("No aisles available") },
-                            onClick = { }
+                            onClick = { },
+                            modifier = Modifier.semantics { contentDescription = "Aucune allée disponible" }
                         )
                     } else {
                         aisles.forEach { aisle ->
@@ -117,6 +145,7 @@ fun AddNewMedicineScreen(
                                 },
                                 modifier = Modifier
                                     .testTag("aisleItem_${aisle.name}")
+                                    .semantics { contentDescription = "Allée ${aisle.name}" }
                             )
                         }
                     }
@@ -146,6 +175,7 @@ fun AddNewMedicineScreen(
                 modifier = Modifier
                     .align(Alignment.End)
                     .testTag("addMedicineButton")
+                    .semantics { contentDescription = "Bouton pour ajouter le médicament" }
             ) {
                 Text("Add Medicine")
             }

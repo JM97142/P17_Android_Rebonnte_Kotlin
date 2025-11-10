@@ -17,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,12 +34,17 @@ fun EmailScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = stringResource(id = R.string.sign_in_email),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.sign_in_email),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.semantics {
+                            heading()
+                            contentDescription = "Connexion par e-mail"
+                        }
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("sign_in") }) {
                         Icon(
@@ -52,7 +60,10 @@ fun EmailScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
+                .padding(padding)
+                .semantics {
+                    contentDescription = "Écran de connexion par e-mail"
+                },
             color = MaterialTheme.colorScheme.background
         ) {
             val scrollState = rememberScrollState()
@@ -68,7 +79,11 @@ fun EmailScreen(
                 Text(
                     text = stringResource(id = R.string.app_name),
                     color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    modifier = Modifier.semantics {
+                        heading()
+                        contentDescription = "Logo et nom de l'application"
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -78,7 +93,8 @@ fun EmailScreen(
                     modifier = Modifier
                         .padding(16.dp, bottom = 16.dp)
                         .width(300.dp)
-                        .height(50.dp),
+                        .height(50.dp)
+                        .semantics { contentDescription = "Se connecter avec l'adresse e-mail" },
                     shape = RectangleShape,
                 ) {
                     Text(
@@ -95,7 +111,8 @@ fun EmailScreen(
                     modifier = Modifier
                         .padding(16.dp, bottom = 16.dp)
                         .width(300.dp)
-                        .height(50.dp),
+                        .height(50.dp)
+                        .semantics { contentDescription = "Créer un compte avec l'adresse e-mail" },
                     shape = RectangleShape,
                 ) {
                     Text(

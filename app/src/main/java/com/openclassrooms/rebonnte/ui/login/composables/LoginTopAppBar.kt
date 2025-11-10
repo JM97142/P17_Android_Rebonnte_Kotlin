@@ -10,6 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.navigation.NavController
 import com.openclassrooms.rebonnte.R
 
@@ -23,7 +26,11 @@ fun LoginTopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.sign_in),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = androidx.compose.ui.Modifier.semantics {
+                    heading()
+                    contentDescription = "Connexion utilisateur, étape $currentStep"
+                }
             )
         },
         navigationIcon = {

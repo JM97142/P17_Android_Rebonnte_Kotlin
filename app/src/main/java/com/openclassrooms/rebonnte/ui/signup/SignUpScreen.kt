@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -23,7 +26,6 @@ import com.openclassrooms.rebonnte.ui.signup.composables.PasswordInput
 import com.openclassrooms.rebonnte.ui.signup.composables.SignUpTopBar
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
     onLoginSuccess: () -> Unit,
@@ -38,7 +40,9 @@ fun SignUpScreen(
     // Gère les événements de navigation ou messages
     LaunchedEffect(event) {
         when (val e = event) {
-            is SignUpEvent.ShowMessage -> Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            is SignUpEvent.ShowMessage -> {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
             is SignUpEvent.NavigateToAisle -> onLoginSuccess()
             null -> {}
         }
@@ -46,7 +50,12 @@ fun SignUpScreen(
     }
 
     Scaffold(
-        topBar = { SignUpTopBar(currentStep = uiState.currentStep, onBack = { handleBack(navController, viewModel) }) }
+        topBar = {
+            SignUpTopBar(
+                currentStep = uiState.currentStep,
+                onBack = { handleBack(navController, viewModel) }
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -85,7 +94,9 @@ fun SignUpScreen(
 
             if (uiState.isLoading) {
                 Spacer(modifier = Modifier.height(20.dp))
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier.semantics { contentDescription = "Chargement en cours" }
+                )
             }
         }
     }
@@ -95,8 +106,12 @@ fun SignUpScreen(
 fun DisplayAppIcon() {
     Text(
         text = stringResource(id = R.string.app_name),
-        color = Color.Black,
-        fontSize = 20.sp
+        color = MaterialTheme.colorScheme.onBackground,
+        fontSize = 20.sp,
+        modifier = Modifier.semantics {
+            heading()
+            contentDescription = "Nom de l'application"
+        }
     )
 }
 

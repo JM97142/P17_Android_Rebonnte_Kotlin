@@ -12,6 +12,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
@@ -38,10 +43,7 @@ fun MedicineScreen(
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(medicines, key = {
-            val medicineId = it.id ?: UUID.randomUUID().toString()
-            medicineId
-        }) { medicine ->
+        items(medicines, key = { it.id ?: UUID.randomUUID().toString() }) { medicine ->
             SwipeToDeleteItem(
                 onDelete = { medicineViewModel.deleteMedicine(medicine.id) }
             ) {
@@ -50,7 +52,9 @@ fun MedicineScreen(
                 MedicineItem(
                     medicine = medicine,
                     aisle = aisle,
-                    onClick = { navController.navigate("medicine_detail/${medicine.name}") }
+                    onClick = {
+                        navController.navigate("medicine_detail/${medicine.name}")
+                    }
                 )
             }
         }
@@ -65,7 +69,7 @@ fun SwipeToDeleteItem(
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
     var showDialog by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope() // Pour appeler snapTo
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(swipeState.currentValue) {
         if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart ||
@@ -83,8 +87,21 @@ fun SwipeToDeleteItem(
                     swipeState.snapTo(SwipeToDismissBoxValue.Settled)
                 }
             },
-            title = { Text("Confirm Deletion") },
-            text = { Text("Are you sure you want to delete this item?") },
+            title = {
+                Text(
+                    "Confirm Deletion",
+                    modifier = Modifier.semantics { heading() }
+                )
+            },
+            text = {
+                Text(
+                    "Are you sure you want to delete this item?",
+                    modifier = Modifier.semantics {
+                        liveRegion = LiveRegionMode.Assertive
+                        contentDescription = "Confirmation de suppression"
+                    }
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -93,7 +110,8 @@ fun SwipeToDeleteItem(
                         coroutineScope.launch {
                             swipeState.snapTo(SwipeToDismissBoxValue.Settled)
                         }
-                    }
+                    },
+                    modifier = Modifier.semantics { contentDescription = "Confirmer la suppression" }
                 ) {
                     Text("Delete", color = Color.Red)
                 }
@@ -105,7 +123,8 @@ fun SwipeToDeleteItem(
                         coroutineScope.launch {
                             swipeState.snapTo(SwipeToDismissBoxValue.Settled)
                         }
-                    }
+                    },
+                    modifier = Modifier.semantics { contentDescription = "Annuler la suppression" }
                 ) {
                     Text("Cancel")
                 }
@@ -133,7 +152,7 @@ fun SwipeToDeleteItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = "Supprimer le médicament",
                     tint = Color.White
                 )
             }
