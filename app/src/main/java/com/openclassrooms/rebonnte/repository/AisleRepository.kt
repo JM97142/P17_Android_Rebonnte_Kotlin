@@ -35,28 +35,30 @@ class AisleRepository(private val firestore: FirebaseFirestore) {
     fun loadAisles() {
         listenerRegistration?.remove()
 
-        listenerRegistration = firestore.collection(AISLES_COLLECTION)
-            .orderBy("timestamp", Query.Direction.ASCENDING)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    println("Snapshot listener error: $e")
-                    return@addSnapshotListener
-                }
+        val collectionRef = firestore.collection(AISLES_COLLECTION)
 
-                val aisleList = snapshot?.documents?.mapNotNull {
-                    it.toObject(Aisle::class.java)
-                } ?: emptyList()
-
-                _aisles.value = aisleList
-
-                if (aisleList.isEmpty()) {
-                    val defaultAisle = Aisle("Aisle 1")
-
-                    _aisles.value = listOf(defaultAisle)
-
-                    addAisle(defaultAisle)
-                }
+        // Vérifie si la collection est vide avant d'attacher le listener
+        collectionRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.isEmpty) {
+                val defaultAisle = Aisle("Aisle 1")
+                addAisle(defaultAisle)
             }
+
+            listenerRegistration = collectionRef
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .addSnapshotListener { snapshotListener, e ->
+                    if (e != null) {
+                        println("Snapshot listener error: $e")
+                        return@addSnapshotListener
+                    }
+
+                    val aisleList = snapshotListener?.documents?.mapNotNull {
+                        it.toObject(Aisle::class.java)
+                    } ?: emptyList()
+
+                    _aisles.value = aisleList
+                }
+        }
     }
 
     /**

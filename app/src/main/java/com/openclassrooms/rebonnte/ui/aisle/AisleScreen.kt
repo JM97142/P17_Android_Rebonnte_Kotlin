@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.openclassrooms.rebonnte.ui.aisle.composables.AisleItem
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,8 +56,9 @@ fun SwipeToDeleteItem(
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
     var showDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-    // Observe swipe state
+    // Observe swipe state changes (this LaunchedEffect is OK because it's inside a @Composable)
     LaunchedEffect(swipeState.currentValue) {
         if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart ||
             swipeState.currentValue == SwipeToDismissBoxValue.StartToEnd
@@ -68,7 +70,12 @@ fun SwipeToDeleteItem(
     // Confirmation Dialog
     if (showDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = {
+                showDialog = false
+                coroutineScope.launch {
+                    swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+                }
+            },
             title = { Text("Confirm Deletion") },
             text = { Text("Are you sure you want to delete this item?") },
             confirmButton = {
@@ -76,13 +83,24 @@ fun SwipeToDeleteItem(
                     onClick = {
                         showDialog = false
                         onDelete()
+                        coroutineScope.launch {
+                            swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+                        }
                     }
                 ) {
                     Text("Delete", color = Color.Red)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        // Reset the swipe state when canceling
+                        coroutineScope.launch {
+                            swipeState.snapTo(SwipeToDismissBoxValue.Settled)
+                        }
+                    }
+                ) {
                     Text("Cancel")
                 }
             }
@@ -91,9 +109,12 @@ fun SwipeToDeleteItem(
 
     SwipeToDismissBox(
         state = swipeState,
+        enableDismissFromStartToEnd = true,
+        enableDismissFromEndToStart = true,
         backgroundContent = {
-            val color = when (swipeState.dismissDirection) {
-                SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> Color.Red
+            val color = when (swipeState.targetValue) {
+                SwipeToDismissBoxValue.EndToStart,
+                SwipeToDismissBoxValue.StartToEnd -> Color.Red
                 else -> MaterialTheme.colorScheme.surface
             }
 
